@@ -1,0 +1,15 @@
+<div class="cell" id="record_<%= record.id %>">
+  <%= link_to record_path(record),
+        class: "cell-btn",
+        data: {
+          turbo_frame: "panel_content",
+          action: "panel#open"
+        },
+        aria: { label: "#{record.artist} — #{record.title}" } do %>
+    <%= render "sleeve", record: record %>
+    <div class="cell-overlay">
+      <div class="cell-overlay-artist"><%= record.artist %></div>
+      <div class="cell-overlay-title"><%= record.title %></div>
+    </div>
+  <% end %>
+</div>

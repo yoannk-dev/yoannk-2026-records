@@ -1,0 +1,73 @@
+<div class="app">
+  <header class="masthead">
+    <h1 class="masthead-title">
+      Vinyle
+      <span class="masthead-disc" aria-hidden="true">
+        <span class="masthead-disc-label" style="background: var(--accent)">
+          <span class="masthead-disc-notch"></span>
+          <span class="masthead-disc-hole"></span>
+        </span>
+      </span>
+    </h1>
+    <div class="masthead-meta">
+      <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
+      <% last = @owner&.user_records&.order(added_at: :desc)&.first %>
+      <% if last %>
+        <div>last added <%= last.added_at&.strftime("%-d %b %Y") %></div>
+      <% end %>
+    </div>
+  </header>
+
+  <header class="topbar" data-controller="filter" data-filter-genre-value="<%= @genre %>">
+    <nav class="filters" aria-label="Filter by genre">
+      <%= link_to "All", records_path,
+            class: "chip #{'chip-active' if @genre.blank?}",
+            data: { turbo_action: "replace" } %>
+      <% @genres.each do |g| %>
+        <%= link_to g, records_path(genre: g),
+              class: "chip #{'chip-active' if @genre == g}",
+              data: { turbo_action: "replace" } %>
+      <% end %>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="icon-btn"
+              data-action="theme#toggle"
+              aria-label="Toggle theme"
+              title="Toggle theme">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
+                stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="add-prompt-wrap"
+           data-controller="add-prompt"
+           data-add-prompt-logged-in-value="<%= user_signed_in? %>">
+        <button class="btn btn-primary"
+                data-action="add-prompt#open">
+          <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">
+            <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Add new
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid" id="records-grid">
+    <%= render partial: "record", collection: @records, as: :record %>
+  </main>
+
+  <% if @records.empty? %>
+    <div class="empty">
+      <%= @genre.present? ? "Nothing in #{@genre} yet." : "No records in the collection yet." %>
+    </div>
+  <% end %>
+
+  <% if @has_more %>
+    <div data-controller="infinite-scroll"
+         data-infinite-scroll-url-value="<%= records_path(page: @page + 1, genre: @genre) %>">
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,105 @@
+<turbo-frame id="panel_content">
+  <div class="panel-inner">
+    <div class="panel-top">
+      <div class="panel-kicker"><%= [@record.genre, @record.year].compact.join(" · ") %></div>
+      <button class="icon-btn"
+              data-action="panel#close"
+              aria-label="Close panel">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-cover-wrap">
+      <div class="panel-disc" data-controller="panel-disc">
+        <div class="vinyl-disc"
+             style="width:236px;height:236px;background:repeating-radial-gradient(circle,#181818 0 2px,#232323 2px 4px)">
+          <div class="vinyl-label" style="background:<%= @record.cover_bg %>">
+            <div class="vinyl-hole"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-cover">
+        <%= render "sleeve", record: @record, radius: 2 %>
+      </div>
+    </div>
+
+    <div class="panel-heading">
+      <div class="panel-artist"><%= @record.artist %></div>
+      <h2 class="panel-title"><%= @record.title %></h2>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-row">
+        <div class="meta-label">Label</div>
+        <div class="meta-value"><%= @record.label&.name || "—" %></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Cat #</div>
+        <div class="meta-value"><%= @record.catalog_number || "—" %></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Format</div>
+        <div class="meta-value"><%= @record.format || "—" %></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Condition</div>
+        <div class="meta-value"><%= @user_record&.condition || "—" %></div>
+      </div>
+    </div>
+
+    <% tl = @record.tracklist %>
+    <% if tl&.dig("a")&.any? || tl&.dig("b")&.any? %>
+      <div class="tracklist">
+        <% if tl["a"]&.any? %>
+          <div class="tracklist-side">
+            <div class="side-label">Side A</div>
+            <ol>
+              <% tl["a"].each do |track| %>
+                <li><%= track %></li>
+              <% end %>
+            </ol>
+          </div>
+        <% end %>
+        <% if tl["b"]&.any? %>
+          <div class="tracklist-side">
+            <div class="side-label">Side B</div>
+            <ol>
+              <% tl["b"].each do |track| %>
+                <li><%= track %></li>
+              <% end %>
+            </ol>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @record.barcode.present? %>
+      <div class="panel-barcode">
+        <%= barcode_html(@record.barcode, height: 30) %>
+      </div>
+    <% end %>
+
+    <div class="panel-actions">
+      <% if @record.discogs_id.present? %>
+        <%= link_to "View on Discogs", "https://www.discogs.com/release/#{@record.discogs_id}",
+              class: "btn btn-ghost",
+              target: "_blank",
+              rel: "noopener noreferrer" do %>
+          View on Discogs
+          <svg width="11" height="11" viewBox="0 0 11 11" style="margin-left:6px">
+            <path d="M2 9L9 2M4 2h5v5" stroke="currentColor" stroke-width="1.4"
+                  fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        <% end %>
+      <% else %>
+        <span></span>
+      <% end %>
+    </div>
+
+    <% if @user_record&.added_at %>
+      <div class="panel-added">Added <%= @user_record.added_at.strftime("%-d %b %Y") %></div>
+    <% end %>
+  </div>
+</turbo-frame>

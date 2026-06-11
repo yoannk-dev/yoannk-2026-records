@@ -1,0 +1,24 @@
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">Vinyle<span>.</span></div>
+
+    <% if alert.present? %>
+      <div class="login-error"><%= alert %></div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name),
+                 html: { "data-turbo" => "false" }) do |f| %>
+      <div class="form-field">
+        <%= f.label :email, "Email" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      </div>
+
+      <div class="form-field">
+        <%= f.label :password, "Password" %>
+        <%= f.password_field :password, autocomplete: "current-password" %>
+      </div>
+
+      <%= f.submit "Sign in", class: "btn btn-primary login-submit" %>
+    <% end %>
+  </div>
+</div>
