@@ -1,0 +1,29 @@
+// ==========================================================================
+// Design tokens — CSS custom properties enable runtime theme switching
+// ==========================================================================
+
+:root[data-theme="light"] {
+  --bg: #f5f4f1;
+  --surface: #ffffff;
+  --ink: #161513;
+  --muted: #8b877e;
+  --line: #e5e2db;
+  --topbar: rgba(245, 244, 241, 0.86);
+  --accent: #e8541e;
+  --cover-radius: 2px;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e0e10;
+  --surface: #1a1a1e;
+  --ink: #f0efec;
+  --muted: #84848b;
+  --line: #27272c;
+  --topbar: rgba(14, 14, 16, 0.86);
+  --accent: #e8541e;
+  --cover-radius: 2px;
+}
+
+@keyframes disc-spin {
+  to { transform: rotate(360deg); }
+}

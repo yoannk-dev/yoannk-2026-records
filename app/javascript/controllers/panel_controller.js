@@ -19,6 +19,7 @@ export default class extends Controller {
   }
 
   open(event) {
+    this._collectionSearch = window.location.search
     const url = event.currentTarget.getAttribute("href")
     history.pushState({}, "", url)
     this._show()
@@ -26,9 +27,8 @@ export default class extends Controller {
 
   close() {
     this._hide()
-    const base = window.location.pathname.replace(/\/records\/\d+.*/, "/records")
-    const search = window.location.search
-    history.pushState({}, "", base + search)
+    const base = window.location.pathname.replace(/\/records\/\d+.*/, "/")
+    history.pushState({}, "", base + (this._collectionSearch || ""))
     const frame = document.getElementById("panel_content")
     if (frame) frame.innerHTML = ""
   }

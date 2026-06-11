@@ -1,0 +1,19 @@
+// ==========================================================================
+// Flash messages — inline notice and alert banners
+// ==========================================================================
+
+.flash {
+  padding: 12px 28px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.flash-notice {
+  background: #d4edda;
+  color: #155724;
+}
+
+.flash-alert {
+  background: #f8d7da;
+  color: #721c24;
+}

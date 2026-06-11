@@ -1,0 +1,275 @@
+@use "../abstracts/mixins" as *;
+
+// ==========================================================================
+// Panel — slide-in detail view, vinyl disc, metadata, tracklist, barcode
+// ==========================================================================
+
+// --- Scrim overlay ---
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(10, 10, 10, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+
+  @include reduced-motion {
+    transition: none;
+  }
+}
+
+.scrim-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+// --- Panel container ---
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 51;
+  width: min(460px, 100vw);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  transform: translateX(103%);
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  @include reduced-motion {
+    transition: none;
+  }
+}
+
+.panel-open {
+  transform: translateX(0);
+}
+
+.panel-inner {
+  padding: 20px 28px 36px;
+
+  @include respond-to("mobile") {
+    padding: 18px 20px 32px;
+  }
+}
+
+.panel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.panel-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+// --- Cover + sliding vinyl disc ---
+
+.panel-cover-wrap {
+  position: relative;
+  height: 250px;
+  margin-bottom: 22px;
+}
+
+.panel-cover {
+  position: relative;
+  z-index: 1;
+  width: 250px;
+  height: 250px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+// Disc slides right 0.3 s after panel opens (panel-disc controller adds .panel-disc-out)
+.panel-disc {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 0;
+  transform: translateX(0);
+  transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1) 0.3s;
+
+  @include reduced-motion {
+    transition: none;
+  }
+}
+
+.panel-disc-out {
+  transform: translateX(128px);
+}
+
+// --- Vinyl disc anatomy ---
+
+.vinyl-disc {
+  position: relative;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.vinyl-label {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-hole {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+// --- Heading ---
+
+.panel-heading {
+  margin-bottom: 22px;
+}
+
+.panel-artist {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.panel-title {
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: pretty;
+}
+
+// --- Metadata grid ---
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+  border-top: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.meta-value {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+// --- Tracklist ---
+
+.tracklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.side-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.tracklist ol {
+  list-style: none;
+  counter-reset: track;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tracklist li {
+  counter-increment: track;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  display: flex;
+  gap: 8px;
+
+  &::before {
+    content: counter(track);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 12px;
+    padding-top: 1px;
+  }
+}
+
+// --- Barcode ---
+
+.panel-barcode {
+  margin-bottom: 22px;
+  color: var(--ink);
+}
+
+.barcode {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.barcode-bars {
+  display: flex;
+  align-items: stretch;
+}
+
+.barcode-digits {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+// --- Actions and footer ---
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-added {
+  margin-top: 18px;
+  font-size: 11px;
+  color: var(--muted);
+}

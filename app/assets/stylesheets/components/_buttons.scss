@@ -1,0 +1,56 @@
+// ==========================================================================
+// Buttons — icon button, primary, ghost, and danger variants
+// ==========================================================================
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: var(--ink);
+    background: var(--line);
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 999px;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.btn-ghost {
+  border: 1px solid var(--line);
+  color: var(--ink);
+
+  &:hover {
+    background: var(--line);
+  }
+}
+
+.btn-danger {
+  color: var(--muted);
+
+  &:hover {
+    color: #c0392b;
+  }
+}

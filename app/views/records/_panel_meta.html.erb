@@ -1,0 +1,19 @@
+<%# locals: (record:, user_record:) %>
+<div class="meta-grid">
+  <div class="meta-row">
+    <div class="meta-label">Label</div>
+    <div class="meta-value"><%= record.label&.name || "—" %></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-label">Cat #</div>
+    <div class="meta-value"><%= record.catalog_number || "—" %></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-label">Format</div>
+    <div class="meta-value"><%= record.format || "—" %></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-label">Condition</div>
+    <div class="meta-value"><%= user_record&.condition || "—" %></div>
+  </div>
+</div>

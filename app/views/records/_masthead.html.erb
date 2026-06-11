@@ -1,0 +1,18 @@
+<header class="masthead">
+  <h1 class="masthead-title">
+    Vinyle
+    <span class="masthead-disc" aria-hidden="true">
+      <span class="masthead-disc-label" style="background: var(--accent)">
+        <span class="masthead-disc-notch"></span>
+        <span class="masthead-disc-hole"></span>
+      </span>
+    </span>
+  </h1>
+  <div class="masthead-meta">
+    <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
+    <% last = @owner&.user_records&.order(added_at: :desc)&.first %>
+    <% if last %>
+      <div>last added <%= last.added_at&.strftime("%-d %b %Y") %></div>
+    <% end %>
+  </div>
+</header>

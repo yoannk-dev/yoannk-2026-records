@@ -1,0 +1,84 @@
+@use "../abstracts/mixins" as *;
+
+// ==========================================================================
+// Grid — record collection layout and individual cell cards
+// ==========================================================================
+
+.grid {
+  display: grid;
+  padding: 20px 28px 64px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+
+  @include respond-to("mobile") {
+    padding: 14px 16px 56px;
+  }
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.cell-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--cover-radius);
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    .cell-overlay {
+      opacity: 1;
+    }
+  }
+}
+
+// Gradient overlay revealed on hover
+.cell-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px 13px;
+  background: linear-gradient(to top, rgba(8, 8, 8, 0.72) 0%, rgba(8, 8, 8, 0.28) 45%, transparent 70%);
+  color: #fff;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+
+  @include reduced-motion {
+    transition: none;
+  }
+}
+
+.cell-overlay-artist {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.cell-overlay-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 2px;
+}
+
+.empty {
+  padding: 80px 28px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}

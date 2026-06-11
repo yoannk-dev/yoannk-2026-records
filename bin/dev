@@ -1,2 +1,15 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+require "fileutils"
+
+APP_ROOT = File.expand_path("..", __dir__)
+FileUtils.chdir(APP_ROOT)
+
+pids = [
+  Process.spawn("bin/rails dartsass:watch", out: $stdout, err: $stderr),
+  Process.spawn("bin/rails server #{ARGV.join(' ')}", out: $stdout, err: $stderr)
+]
+
+trap("SIGINT")  { pids.each { |pid| Process.kill("SIGINT",  pid) rescue nil } }
+trap("SIGTERM") { pids.each { |pid| Process.kill("SIGTERM", pid) rescue nil } }
+
+pids.each { |pid| Process.wait(pid) rescue nil }

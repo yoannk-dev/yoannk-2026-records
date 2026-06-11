@@ -1,0 +1,37 @@
+<%# locals: (genres:, genre:) %>
+<header class="topbar" data-controller="filter" data-filter-genre-value="<%= genre %>">
+  <nav class="filters" aria-label="Filter by genre">
+    <%= link_to "All", root_path,
+          class: "chip #{'chip-active' if genre.blank?}",
+          data: { turbo_action: "replace" } %>
+    <% genres.each do |g| %>
+      <%= link_to g, root_path(genre: g),
+            class: "chip #{'chip-active' if genre == g}",
+            data: { turbo_action: "replace" } %>
+    <% end %>
+  </nav>
+
+  <div class="topbar-actions">
+    <button class="icon-btn"
+            data-action="theme#toggle"
+            aria-label="Toggle theme"
+            title="Toggle theme">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+        <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
+              stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="add-prompt-wrap"
+         data-controller="add-prompt"
+         data-add-prompt-logged-in-value="<%= user_signed_in? %>">
+      <button class="btn btn-primary"
+              data-action="add-prompt#open">
+        <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">
+          <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Add new
+      </button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,26 @@
+<%# locals: (record:) %>
+<% tl = record.tracklist %>
+<% if tl&.dig("a")&.any? || tl&.dig("b")&.any? %>
+  <div class="tracklist">
+    <% if tl["a"]&.any? %>
+      <div class="tracklist-side">
+        <div class="side-label">Side A</div>
+        <ol>
+          <% tl["a"].each do |track| %>
+            <li><%= track %></li>
+          <% end %>
+        </ol>
+      </div>
+    <% end %>
+    <% if tl["b"]&.any? %>
+      <div class="tracklist-side">
+        <div class="side-label">Side B</div>
+        <ol>
+          <% tl["b"].each do |track| %>
+            <li><%= track %></li>
+          <% end %>
+        </ol>
+      </div>
+    <% end %>
+  </div>
+<% end %>

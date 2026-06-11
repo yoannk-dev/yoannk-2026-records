@@ -1,0 +1,13 @@
+// ==========================================================================
+// Mixins — responsive breakpoints and motion preferences
+// ==========================================================================
+
+@mixin respond-to($bp) {
+  @if $bp == "mobile" {
+    @media (max-width: 720px) { @content; }
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) { @content; }
+}

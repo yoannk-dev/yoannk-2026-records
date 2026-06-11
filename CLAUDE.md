@@ -13,6 +13,9 @@ bin/rubocop        # Lint Ruby (rails-omakase style)
 bin/brakeman --quiet --no-pager  # Static security analysis
 bin/bundler-audit  # Audit gems for known CVEs
 
+bin/rails dartsass:build      # One-off SCSS compile → app/assets/builds/application.css
+bin/rails dartsass:watch      # Watch + recompile on change (bin/dev runs this automatically)
+
 bin/rails db:migrate          # Run pending migrations
 bin/rails db:migrate RAILS_ENV=test
 bin/rails db:seed             # Create owner user + 18 seed records
@@ -32,7 +35,7 @@ No test suite is wired up yet (`rails/test_unit/railtie` is commented out in `co
 
 **Single database setup:** all three Solid adapters share the primary database. Their tables are managed via standard migrations in `db/migrate/` and reflected in `db/schema.rb`.
 
-**Frontend:** JavaScript is managed via importmap (no build step). Stimulus controllers live in `app/javascript/controllers/`. Assets served by Propshaft.
+**Frontend:** JavaScript is managed via importmap (no build step). Stimulus controllers live in `app/javascript/controllers/`. Assets served by Propshaft. CSS is authored in SCSS (`dartsass-rails`) and compiled to `app/assets/builds/application.css`.
 
 **Deployment:** Kamal (`config/deploy.yml`) — builds an amd64 Docker image, pushes to a local registry at `localhost:5555`, and deploys to the server at `192.168.0.1`. `RAILS_MASTER_KEY` is the only secret injected at runtime.
 
@@ -43,6 +46,8 @@ No test suite is wired up yet (`rails/test_unit/railtie` is commented out in `co
 ## Domain
 
 **Single-owner vinyl collection app.** One user (seeded, no registration). Public can browse; only the owner can add records.
+
+**Routing:** `GET /` is the only collection URL (`records#index`). `/records` does not exist — `resources :records` exposes only `:show` and `:create`. Use `root_path` (not `records_path`) for collection links and pagination.
 
 ### Data model
 
@@ -70,16 +75,26 @@ When `cover_image_url` is blank, records display a CSS-only procedural sleeve. C
 | `app/helpers/sleeves_helper.rb` | `sleeve_motif_tag`, `barcode_html` |
 | `app/views/records/_sleeve.html.erb` | Procedural cover partial |
 | `app/views/records/_record.html.erb` | Grid cell |
+| `app/views/records/_masthead.html.erb` | Hero header with animated disc and collection stats |
+| `app/views/records/_topbar.html.erb` | Sticky bar with genre filter chips and action buttons |
+| `app/views/records/_panel_cover.html.erb` | Vinyl disc + sleeve cover shown in the detail panel |
+| `app/views/records/_panel_meta.html.erb` | Label / Cat # / Format / Condition metadata grid |
+| `app/views/records/_panel_tracklist.html.erb` | Side A / Side B tracklists |
 | `app/views/records/show.html.erb` | Panel content (inside `<turbo-frame id="panel_content">`) |
-| `app/views/layouts/application.html.erb` | Panel + scrim live here; `data-controller="panel"` is on `<body>` |
-| `app/assets/stylesheets/application.css` | All styles (no framework) |
+| `app/views/layouts/application.html.erb` | Root layout; `data-controller="panel"` is on `<body>` |
+| `app/views/layouts/_flash.html.erb` | Notice / alert flash messages |
+| `app/views/layouts/_panel.html.erb` | Scrim overlay + panel aside |
+| `app/assets/stylesheets/application.scss` | SCSS entry point — imports only |
+| `app/assets/stylesheets/abstracts/` | `_variables.scss` (CSS tokens) · `_mixins.scss` (respond-to, reduced-motion) |
+| `app/assets/stylesheets/base/` | `_reset.scss` · `_typography.scss` |
+| `app/assets/stylesheets/components/` | One file per UI block (masthead, topbar, buttons, grid, sleeve, panel, flash, forms, tooltip) |
 | `db/seeds.rb` | Owner user + 18 records |
 
 ### Stimulus controllers
 
 | Controller | Responsibility |
 |-----------|---------------|
-| `panel` | Slide-in detail panel — on `<body>` (must be ancestor of both grid and panel aside). Opens on record link click, closes on Escape/scrim/close button. Pushes URL via `history.pushState`. |
+| `panel` | Slide-in detail panel — on `<body>` (must be ancestor of both grid and panel aside). Opens on record link click, closes on Escape/scrim/close button. Pushes URL via `history.pushState`. On open, saves `window.location.search` (genre filter) so it can be restored to `root_path` on close. |
 | `panel-disc` | Adds `panel-disc-out` class 50 ms after connecting (triggers CSS slide animation). Lives inside the panel turbo-frame. |
 | `theme` | Toggles `data-theme` on `<html>`, persists to `localStorage`. |
 | `filter` | Syncs `chip-active` class with the current `?genre=` param on connect. |
