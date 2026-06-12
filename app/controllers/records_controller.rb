@@ -18,6 +18,17 @@ class RecordsController < ApplicationController
   def show
     @record      = @owner&.records&.find(params[:id])
     @user_record = @owner&.user_records&.find_by(record: @record)
+
+    unless turbo_frame_request?
+      @open_record = @record
+      base         = @owner ? @owner.records.includes(:label) : Record.none
+      @genre       = nil
+      @genres      = @owner ? @owner.records.distinct.pluck(:genre).compact.sort : []
+      @page        = 1
+      @records     = base.order(created_at: :desc).limit(PER_PAGE)
+      @has_more    = base.count > PER_PAGE
+      render :index
+    end
   end
 
   def new

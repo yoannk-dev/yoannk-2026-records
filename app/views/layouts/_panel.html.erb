@@ -1,7 +1,7 @@
-<div id="scrim" class="scrim"
+<div id="scrim" class="scrim<%= ' scrim-open' if @open_record %>"
      data-panel-target="scrim"
      data-action="click->panel#close"></div>
 
-<aside id="panel" class="panel" data-panel-target="panel">
-  <turbo-frame id="panel_content"></turbo-frame>
+<aside id="panel" class="panel<%= ' panel-open' if @open_record %>" data-panel-target="panel">
+  <turbo-frame id="panel_content"<% if @open_record %> src="<%= record_path(@open_record) %>"<% end %>></turbo-frame>
 </aside>
