@@ -53,22 +53,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 24px;
+  justify-content: flex-end;
+  gap: 20px;
   padding: 0 24px 40px;
   overflow-y: auto;
+  position: relative;
 }
 
 .scanner-viewfinder {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
+  position: absolute;
+  inset: 0;
 }
 
 .scanner-video {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
+  height: 100%;
   object-fit: cover;
   background: #111;
   display: block;
@@ -111,14 +110,21 @@
 }
 
 .scanner-status {
-  color: rgba(255, 255, 255, 0.75);
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   text-align: center;
   max-width: 320px;
   line-height: 1.5;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 20px;
 }
 
 .scanner-manual {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 360px;
   display: flex;
@@ -142,6 +148,11 @@
       border-color: rgba(255, 255, 255, 0.55);
     }
   }
+}
+
+.scanner-body .btn {
+  position: relative;
+  z-index: 1;
 }
 
 // Utility used by scanner controller
