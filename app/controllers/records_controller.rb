@@ -104,8 +104,9 @@ class RecordsController < ApplicationController
     end
 
     data      = JSON.parse(response.body)
-    tracklist = (data["tracklist"] || []).map do |t|
-      { position: t["position"], title: t["title"], duration: t["duration"] }
+    tracklist = (data["tracklist"] || []).each_with_object({}) do |t, sides|
+      side = t["position"].to_s.match(/\A([a-z])/i)&.[](1)&.downcase || "a"
+      (sides[side] ||= []) << t["title"].to_s
     end
 
     render json: { tracklist: tracklist }
