@@ -11,11 +11,18 @@ export default class extends Controller {
       if (!window.location.pathname.match(/\/records\/\d+/)) this._hide()
     }
     window.addEventListener("popstate", this._onPopState)
+
+    this._onScannerOpen = () => {
+      this._collectionSearch = window.location.search
+      this._show()
+    }
+    document.addEventListener("scanner:open-panel", this._onScannerOpen)
   }
 
   disconnect() {
     document.removeEventListener("keydown", this._onKeyDown)
     window.removeEventListener("popstate", this._onPopState)
+    document.removeEventListener("scanner:open-panel", this._onScannerOpen)
   }
 
   open(event) {

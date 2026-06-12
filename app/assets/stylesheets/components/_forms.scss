@@ -60,7 +60,8 @@
     color: var(--muted);
   }
 
-  input {
+  input,
+  select {
     height: 40px;
     padding: 0 12px;
     border: 1px solid var(--line);
@@ -71,9 +72,41 @@
     font-size: 14px;
     outline: none;
     transition: border-color 0.15s;
+    appearance: none;
+    width: 100%;
 
     &:focus {
       border-color: var(--ink);
     }
   }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.form-errors {
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.form-error-msg {
+  font-size: 13px;
+  color: #c0392b;
+  font-weight: 500;
+  line-height: 1.4;
+
+  & + & {
+    margin-top: 4px;
+  }
+}
+
+.form-actions {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }

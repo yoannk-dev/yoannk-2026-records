@@ -1,0 +1,84 @@
+<turbo-frame id="panel_content">
+  <div class="panel-inner">
+    <div class="panel-top">
+      <div class="panel-kicker">New Record</div>
+      <button class="icon-btn"
+              data-action="panel#close"
+              aria-label="Close panel">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <% if @record.errors.any? %>
+      <div class="form-errors">
+        <% @record.errors.full_messages.each do |msg| %>
+          <p class="form-error-msg"><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form_with model: @record, url: records_path do |f| %>
+      <%= f.hidden_field :discogs_id %>
+      <%= f.hidden_field :cover_image_url %>
+      <%= f.hidden_field :barcode %>
+
+      <div class="form-field">
+        <%= f.label :artist %>
+        <%= f.text_field :artist, required: true, autocomplete: "off" %>
+      </div>
+
+      <div class="form-field">
+        <%= f.label :title %>
+        <%= f.text_field :title, required: true, autocomplete: "off" %>
+      </div>
+
+      <div class="form-field">
+        <label for="record_label_name">Label</label>
+        <%= text_field_tag "record[label_name]", @label_name,
+              id: "record_label_name",
+              autocomplete: "off" %>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <%= f.label :year %>
+          <%= f.number_field :year, min: 1900, max: Date.today.year %>
+        </div>
+        <div class="form-field">
+          <%= f.label :format %>
+          <%= f.text_field :format %>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <%= f.label :genre %>
+          <%= f.text_field :genre %>
+        </div>
+        <div class="form-field">
+          <%= f.label :country %>
+          <%= f.text_field :country %>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <%= f.label :catalog_number, "Cat. #" %>
+          <%= f.text_field :catalog_number, autocomplete: "off" %>
+        </div>
+        <div class="form-field">
+          <label for="record_condition">Condition</label>
+          <%= select_tag "record[condition]",
+                options_for_select(%w[M NM VG+ VG G+ G F P], @condition || "VG+"),
+                id: "record_condition" %>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Add to Collection", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</turbo-frame>

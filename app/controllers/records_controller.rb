@@ -1,3 +1,5 @@
+require "net/http"
+
 class RecordsController < ApplicationController
   PER_PAGE = 24
 
@@ -18,7 +20,111 @@ class RecordsController < ApplicationController
     @user_record = @owner&.user_records&.find_by(record: @record)
   end
 
+  def new
+    authenticate_user!
+    @record = Record.new(
+      artist:         params[:artist],
+      title:          params[:title],
+      year:           params[:year],
+      genre:          params[:genre],
+      country:        params[:country],
+      format:         params[:format],
+      catalog_number: params[:catalog_number],
+      barcode:        params[:barcode],
+      cover_image_url: params[:cover_image_url],
+      discogs_id:     params[:discogs_id]
+    )
+    @label_name = params[:label]
+    @condition  = "VG+"
+  end
+
+  def discogs_lookup
+    authenticate_user!
+
+    barcode = params[:barcode].to_s.strip
+    return render(json: { error: "invalid_barcode" }, status: :bad_request) if barcode.blank?
+
+    token = ENV["DISCOGS_TOKEN"]
+    return render(json: { error: "not_configured" }, status: :service_unavailable) if token.blank?
+
+    uri = URI("https://api.discogs.com/database/search")
+    uri.query = URI.encode_www_form(barcode: barcode, token: token, per_page: 1)
+
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 5, read_timeout: 10) do |http|
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "VinylRecordsApp/1.0"
+      http.request(req)
+    end
+
+    data    = JSON.parse(response.body)
+    results = data["results"] || []
+
+    if results.empty?
+      return render(json: { error: "not_found" }, status: :not_found)
+    end
+
+    result      = results.first
+    title_parts = result["title"].to_s.split(" - ", 2)
+
+    render json: {
+      discogs_id:      result["id"].to_s,
+      artist:          title_parts.first,
+      title:           title_parts.last,
+      label:           result["label"]&.first,
+      year:            result["year"],
+      genre:           result["genre"]&.first,
+      country:         result["country"],
+      cover_image_url: result["cover_image"],
+      format:          result["format"]&.first,
+      catalog_number:  result["catno"],
+      barcode:         barcode
+    }
+  rescue StandardError
+    render json: { error: "network_error" }, status: :service_unavailable
+  end
+
   def create
     authenticate_user!
+
+    cp = create_record_params
+
+    label = Label.find_or_create_by!(name: cp[:label_name]) if cp[:label_name].present?
+
+    @record = Record.new(
+      artist:          cp[:artist],
+      title:           cp[:title],
+      year:            cp[:year].presence,
+      genre:           cp[:genre].presence,
+      country:         cp[:country].presence,
+      format:          cp[:format].presence,
+      catalog_number:  cp[:catalog_number].presence,
+      barcode:         cp[:barcode].presence,
+      cover_image_url: cp[:cover_image_url].presence,
+      discogs_id:      cp[:discogs_id].presence,
+      label:           label
+    )
+
+    if @record.save
+      current_user.user_records.create!(
+        record:    @record,
+        condition: cp[:condition].presence,
+        added_at:  Time.current
+      )
+      redirect_to @record, notice: "Added to your collection."
+    else
+      @label_name = cp[:label_name]
+      @condition  = cp[:condition]
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def create_record_params
+    params.require(:record).permit(
+      :artist, :title, :year, :genre, :country, :format,
+      :catalog_number, :barcode, :cover_image_url, :discogs_id,
+      :label_name, :condition
+    )
   end
 end

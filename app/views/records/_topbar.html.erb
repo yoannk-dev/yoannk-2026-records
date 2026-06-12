@@ -22,16 +22,75 @@
       </svg>
     </button>
 
-    <div class="add-prompt-wrap"
-         data-controller="add-prompt"
-         data-add-prompt-logged-in-value="<%= user_signed_in? %>">
-      <button class="btn btn-primary"
-              data-action="add-prompt#open">
-        <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">
-          <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        Add new
-      </button>
-    </div>
+    <% if user_signed_in? %>
+      <div data-controller="scanner"
+           data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>">
+        <button class="btn btn-primary" data-action="scanner#open">
+          <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">
+            <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Add new
+        </button>
+
+        <div class="scanner-overlay" data-scanner-target="overlay">
+          <div class="scanner-header">
+            <span class="scanner-title">Scan Barcode</span>
+            <button class="icon-btn scanner-close-btn"
+                    data-action="scanner#close"
+                    aria-label="Close scanner">
+              <svg width="14" height="14" viewBox="0 0 14 14">
+                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="scanner-body">
+            <div class="scanner-viewfinder">
+              <video class="scanner-video"
+                     data-scanner-target="video"
+                     autoplay
+                     playsinline
+                     muted></video>
+              <div class="scanner-reticle"></div>
+            </div>
+
+            <p class="scanner-status" data-scanner-target="status"></p>
+
+            <form class="scanner-manual hidden"
+                  data-scanner-target="manualForm"
+                  data-action="submit->scanner#submitManual">
+              <div class="form-field">
+                <label for="scanner-barcode-input">Barcode</label>
+                <input id="scanner-barcode-input"
+                       type="text"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       placeholder="e.g. 0602435688435"
+                       data-scanner-target="manualInput">
+              </div>
+              <button type="submit" class="btn btn-primary">Look up</button>
+            </form>
+
+            <button class="btn btn-ghost hidden"
+                    data-scanner-target="retryBtn"
+                    data-action="scanner#retry">
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="add-prompt-wrap"
+           data-controller="add-prompt"
+           data-add-prompt-logged-in-value="false">
+        <button class="btn btn-primary"
+                data-action="add-prompt#open">
+          <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">
+            <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Add new
+        </button>
+      </div>
+    <% end %>
   </div>
 </header>

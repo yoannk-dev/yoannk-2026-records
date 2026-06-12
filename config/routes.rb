@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   root "records#index"
-  resources :records, only: [ :show, :create ]
+  get "records/discogs_lookup", to: "records#discogs_lookup", as: :records_discogs_lookup
+  resources :records, only: [ :new, :show, :create ]
 
   devise_for :users,
     path: "",
