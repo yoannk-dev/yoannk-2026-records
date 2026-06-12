@@ -1,5 +1,11 @@
 <%# locals: (record:) %>
 <% tl = record.tracklist %>
+<% if tl.is_a?(Array)
+     tl = tl.each_with_object({}) do |t, sides|
+       side = t["position"].to_s.match(/\A([a-z])/i)&.[](1)&.downcase || "a"
+       (sides[side] ||= []) << t["title"].to_s
+     end
+   end %>
 <% if tl&.dig("a")&.any? || tl&.dig("b")&.any? %>
   <div class="tracklist">
     <% if tl["a"]&.any? %>
