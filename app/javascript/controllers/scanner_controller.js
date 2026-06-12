@@ -9,6 +9,8 @@ export default class extends Controller {
     this._scanning = false
     this._detector = null
     this._retryBarcode = null
+    this._lastCandidate = null
+    this._candidateCount = 0
   }
 
   disconnect() {
@@ -63,15 +65,35 @@ export default class extends Controller {
 
   async _scanLoop() {
     if (!this._scanning) return
-    try {
-      const results = await this._detector.detect(this.videoTarget)
-      if (results.length > 0) {
-        this._scanning = false
-        this._stopCamera()
-        await this._lookup(results[0].rawValue)
-        return
-      }
-    } catch { /* frame not ready yet */ }
+
+    // Wait for the video to have actual pixel data before scanning
+    if (this.videoTarget.readyState >= 2) {
+      try {
+        const results = await this._detector.detect(this.videoTarget)
+        if (results.length > 0) {
+          const value = results[0].rawValue
+          if (value === this._lastCandidate) {
+            this._candidateCount++
+          } else {
+            this._lastCandidate = value
+            this._candidateCount = 1
+          }
+          // Require 3 consistent reads before trusting the result
+          if (this._candidateCount >= 3) {
+            this._scanning = false
+            this._lastCandidate = null
+            this._candidateCount = 0
+            this._stopCamera()
+            await this._lookup(value)
+            return
+          }
+        } else {
+          this._lastCandidate = null
+          this._candidateCount = 0
+        }
+      } catch { /* frame not ready yet */ }
+    }
+
     if (this._scanning) requestAnimationFrame(() => this._scanLoop())
   }
 
