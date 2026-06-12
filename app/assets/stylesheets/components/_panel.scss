@@ -193,10 +193,11 @@
 // --- Tracklist ---
 
 .tracklist {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  width: 100%;
   margin-bottom: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .side-label {

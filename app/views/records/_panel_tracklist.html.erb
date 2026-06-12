@@ -6,27 +6,14 @@
        (sides[side] ||= []) << t["title"].to_s
      end
    end %>
-<% if tl&.dig("a")&.any? || tl&.dig("b")&.any? %>
+<% all_tracks = [ *tl&.dig("a"), *tl&.dig("b") ].compact %>
+<% if all_tracks.any? %>
   <div class="tracklist">
-    <% if tl["a"]&.any? %>
-      <div class="tracklist-side">
-        <div class="side-label">Side A</div>
-        <ol>
-          <% tl["a"].each do |track| %>
-            <li><%= track %></li>
-          <% end %>
-        </ol>
-      </div>
-    <% end %>
-    <% if tl["b"]&.any? %>
-      <div class="tracklist-side">
-        <div class="side-label">Side B</div>
-        <ol>
-          <% tl["b"].each do |track| %>
-            <li><%= track %></li>
-          <% end %>
-        </ol>
-      </div>
-    <% end %>
+    <div class="side-label">Tracklist</div>
+    <ol>
+      <% all_tracks.each do |track| %>
+        <li><%= track %></li>
+      <% end %>
+    </ol>
   </div>
 <% end %>
