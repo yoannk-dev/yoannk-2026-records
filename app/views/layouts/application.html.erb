@@ -16,7 +16,8 @@
   </head>
 
   <body data-controller="panel<%= user_signed_in? ? ' scanner' : '' %>"
-        <% if user_signed_in? %>data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>"<% end %>>
+        <% if user_signed_in? %>data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>"
+        data-scanner-tracklist-url-value="<%= records_discogs_tracklist_path %>"<% end %>>
     <%= render "layouts/flash" %>
     <%= yield %>
     <%= render "layouts/panel" %>

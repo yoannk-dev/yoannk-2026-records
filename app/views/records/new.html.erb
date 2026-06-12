@@ -23,6 +23,7 @@
       <%= f.hidden_field :discogs_id %>
       <%= f.hidden_field :cover_image_url %>
       <%= f.hidden_field :barcode %>
+      <%= hidden_field_tag "record[tracklist]", @tracklist_json %>
 
       <div class="form-field">
         <%= f.label :artist %>

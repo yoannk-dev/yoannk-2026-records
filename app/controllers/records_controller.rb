@@ -6,7 +6,7 @@ class RecordsController < ApplicationController
   def index
     base = @owner ? @owner.records.includes(:label) : Record.none
     base = base.by_genre(params[:genre]) if params[:genre].present?
-    base = base.order(created_at: :asc)
+    base = base.order(created_at: :desc)
 
     @genre    = params[:genre]
     @genres   = @owner ? @owner.records.distinct.pluck(:genre).compact.sort : []
@@ -23,19 +23,21 @@ class RecordsController < ApplicationController
   def new
     authenticate_user!
     @record = Record.new(
-      artist:         params[:artist],
-      title:          params[:title],
-      year:           params[:year],
-      genre:          params[:genre],
-      country:        params[:country],
-      format:         params[:format],
-      catalog_number: params[:catalog_number],
-      barcode:        params[:barcode],
+      artist:          params[:artist],
+      title:           params[:title],
+      year:            params[:year],
+      genre:           params[:genre],
+      country:         params[:country],
+      format:          params[:format],
+      catalog_number:  params[:catalog_number],
+      barcode:         params[:barcode],
       cover_image_url: params[:cover_image_url],
-      discogs_id:     params[:discogs_id]
+      discogs_id:      params[:discogs_id],
+      tracklist:       params[:tracklist].present? ? JSON.parse(params[:tracklist]) : nil
     )
-    @label_name = params[:label]
-    @condition  = "VG+"
+    @label_name    = params[:label]
+    @condition     = "VG+"
+    @tracklist_json = params[:tracklist]
   end
 
   def discogs_lookup
@@ -83,6 +85,34 @@ class RecordsController < ApplicationController
     render json: { error: "network_error" }, status: :service_unavailable
   end
 
+  def discogs_tracklist
+    authenticate_user!
+
+    discogs_id = params[:discogs_id].to_s.strip
+    return render(json: { error: "invalid_id" }, status: :bad_request) if discogs_id.blank?
+
+    token = ENV["DISCOGS_TOKEN"]
+    return render(json: { error: "not_configured" }, status: :service_unavailable) if token.blank?
+
+    uri = URI("https://api.discogs.com/releases/#{discogs_id}")
+    uri.query = URI.encode_www_form(token: token)
+
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 5, read_timeout: 10) do |http|
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "VinylRecordsApp/1.0"
+      http.request(req)
+    end
+
+    data      = JSON.parse(response.body)
+    tracklist = (data["tracklist"] || []).map do |t|
+      { position: t["position"], title: t["title"], duration: t["duration"] }
+    end
+
+    render json: { tracklist: tracklist }
+  rescue StandardError
+    render json: { error: "network_error" }, status: :service_unavailable
+  end
+
   def create
     authenticate_user!
 
@@ -101,6 +131,7 @@ class RecordsController < ApplicationController
       barcode:         cp[:barcode].presence,
       cover_image_url: cp[:cover_image_url].presence,
       discogs_id:      cp[:discogs_id].presence,
+      tracklist:       cp[:tracklist].present? ? JSON.parse(cp[:tracklist]) : nil,
       label:           label
     )
 
@@ -124,7 +155,7 @@ class RecordsController < ApplicationController
     params.require(:record).permit(
       :artist, :title, :year, :genre, :country, :format,
       :catalog_number, :barcode, :cover_image_url, :discogs_id,
-      :label_name, :condition
+      :tracklist, :label_name, :condition
     )
   end
 end

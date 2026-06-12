@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn"]
-  static values = { lookupUrl: String }
+  static values = { lookupUrl: String, tracklistUrl: String }
 
   connect() {
     this._stream = null
@@ -109,6 +109,19 @@ export default class extends Controller {
       const data = await resp.json()
 
       if (resp.ok) {
+        if (data.discogs_id && this.tracklistUrlValue) {
+          this._setStatus("Fetching tracklist…")
+          try {
+            const tlResp = await fetch(
+              `${this.tracklistUrlValue}?discogs_id=${encodeURIComponent(data.discogs_id)}`,
+              { headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" } }
+            )
+            if (tlResp.ok) {
+              const tlData = await tlResp.json()
+              data.tracklist = JSON.stringify(tlData.tracklist)
+            }
+          } catch { /* tracklist is optional */ }
+        }
         this._openPanel(data)
         this._hideOverlay()
       } else if (resp.status === 404) {
