@@ -19,8 +19,13 @@ export default class extends Controller {
     this._showOverlay()
 
     if (!("BarcodeDetector" in window)) {
-      this._showManual("Your browser doesn't support camera scanning. Enter the barcode number below:")
-      return
+      try {
+        const { BarcodeDetector } = await import("barcode-detector")
+        window.BarcodeDetector = BarcodeDetector
+      } catch {
+        this._showManual("Your browser doesn't support camera scanning. Enter the barcode number below:")
+        return
+      }
     }
 
     try {
