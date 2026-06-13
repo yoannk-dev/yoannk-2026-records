@@ -6,7 +6,7 @@
 
 .masthead {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
   padding: 54px 28px 22px;
@@ -19,7 +19,7 @@
 .masthead-title {
   display: flex;
   align-items: baseline;
-  font-size: clamp(64px, 11vw, 148px);
+  font-size: clamp(42px, 11vw, 148px);
   font-weight: 800;
   letter-spacing: -0.055em;
   line-height: 0.88;

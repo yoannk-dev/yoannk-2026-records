@@ -9,21 +9,3 @@
   overflow: hidden;
   container-type: inline-size;
 }
-
-// Record label name stamped at the top of the sleeve
-.sleeve-imprint {
-  position: absolute;
-  top: 6.5%;
-  left: 7%;
-  right: 7%;
-  font-size: 5cqw;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.9;
-  text-align: left;
-  user-select: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}

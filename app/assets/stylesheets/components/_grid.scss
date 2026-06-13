@@ -12,6 +12,7 @@
 
   @include respond-to("mobile") {
     padding: 14px 16px 56px;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
