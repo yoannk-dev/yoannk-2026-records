@@ -1,16 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn"]
+  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn", "barcodeTab", "catnoTab"]
   static values = { lookupUrl: String, tracklistUrl: String }
 
   connect() {
     this._stream = null
     this._scanning = false
     this._detector = null
-    this._retryBarcode = null
+    this._retryValue = null
     this._lastCandidate = null
     this._candidateCount = 0
+    this._mode = "barcode"
   }
 
   disconnect() {
@@ -18,6 +19,8 @@ export default class extends Controller {
   }
 
   async open() {
+    this._mode = "barcode"
+    this._setModeActive("barcode")
     this._showOverlay()
 
     if (!("BarcodeDetector" in window)) {
@@ -25,7 +28,7 @@ export default class extends Controller {
         const { BarcodeDetector } = await import("barcode-detector")
         window.BarcodeDetector = BarcodeDetector
       } catch {
-        this._showManual("Your browser doesn't support camera scanning. Enter the barcode number below:")
+        this._showManual("Votre navigateur ne supporte pas le scan. Entrez le code-barres ci-dessous :")
         return
       }
     }
@@ -39,11 +42,11 @@ export default class extends Controller {
       this._detector = new window.BarcodeDetector({
         formats: ["ean_13", "upc_a", "upc_e", "ean_8"]
       })
-      this._setStatus("Scanning… point your camera at the barcode")
+      this._setStatus("Scan en cours… pointez la caméra vers le code-barres")
       this._scanning = true
       this._scanLoop()
     } catch {
-      this._showManual("Camera access denied. Enter the barcode number below:")
+      this._showManual("Accès caméra refusé. Entrez le code-barres manuellement :")
     }
   }
 
@@ -52,21 +55,36 @@ export default class extends Controller {
     this._hideOverlay()
   }
 
+  async switchMode(event) {
+    const mode = event.currentTarget.dataset.mode
+    if (mode === this._mode) return
+    this._mode = mode
+    this._setModeActive(mode)
+    this._stopCamera()
+    this.retryBtnTarget.classList.add("hidden")
+    this._retryValue = null
+
+    if (mode === "catno") {
+      this._showManual("Entrez le numéro de catalogue inscrit sur l'étiquette :", "", "text", "ex : BLP 1568, ECM 1064")
+    } else {
+      this._showManual("Entrez le code-barres manuellement :", "", "numeric", "ex : 0602435688435")
+    }
+  }
+
   async submitManual(event) {
     event.preventDefault()
-    const barcode = this.manualInputTarget.value.trim()
-    if (barcode) await this._lookup(barcode)
+    const value = this.manualInputTarget.value.trim()
+    if (value) await this._lookup(value)
   }
 
   async retry() {
     this.retryBtnTarget.classList.add("hidden")
-    if (this._retryBarcode) await this._lookup(this._retryBarcode)
+    if (this._retryValue) await this._lookup(this._retryValue)
   }
 
   async _scanLoop() {
     if (!this._scanning) return
 
-    // Wait for the video to have actual pixel data before scanning
     if (this.videoTarget.readyState >= 2) {
       try {
         const results = await this._detector.detect(this.videoTarget)
@@ -78,7 +96,6 @@ export default class extends Controller {
             this._lastCandidate = value
             this._candidateCount = 1
           }
-          // Require 3 consistent reads before trusting the result
           if (this._candidateCount >= 3) {
             this._scanning = false
             this._lastCandidate = null
@@ -97,20 +114,22 @@ export default class extends Controller {
     if (this._scanning) requestAnimationFrame(() => this._scanLoop())
   }
 
-  async _lookup(barcode) {
-    this._setStatus("Looking up on Discogs…")
+  async _lookup(value) {
+    this._setStatus("Recherche sur Discogs…")
     this.manualFormTarget.classList.add("hidden")
+
+    const param = this._mode === "catno" ? "catno" : "barcode"
 
     try {
       const resp = await fetch(
-        `${this.lookupUrlValue}?barcode=${encodeURIComponent(barcode)}`,
+        `${this.lookupUrlValue}?${param}=${encodeURIComponent(value)}`,
         { headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" } }
       )
       const data = await resp.json()
 
       if (resp.ok) {
         if (data.discogs_id && this.tracklistUrlValue) {
-          this._setStatus("Fetching tracklist…")
+          this._setStatus("Récupération de la tracklist…")
           try {
             const tlResp = await fetch(
               `${this.tracklistUrlValue}?discogs_id=${encodeURIComponent(data.discogs_id)}`,
@@ -125,15 +144,24 @@ export default class extends Controller {
         this._openPanel(data)
         this._hideOverlay()
       } else if (resp.status === 404) {
-        this._showManual(`No Discogs result for "${barcode}". Try another barcode or enter it manually:`, barcode)
+        if (this._mode === "barcode") {
+          this._showManual(
+            'Aucun résultat pour ce code-barres. Essayez avec le numéro de catalogue (sur l\'étiquette) via "Catalog #" ci-dessus.',
+            value,
+            "numeric",
+            "ex : 0602435688435"
+          )
+        } else {
+          this._showManual(`Aucun résultat pour "${value}". Vérifiez le numéro de catalogue.`, value, "text", "ex : BLP 1568")
+        }
       } else {
-        this._setStatus("Discogs lookup failed.")
-        this._retryBarcode = barcode
+        this._setStatus("Erreur lors de la recherche Discogs.")
+        this._retryValue = value
         this.retryBtnTarget.classList.remove("hidden")
       }
     } catch {
-      this._setStatus("Network error. Check your connection.")
-      this._retryBarcode = barcode
+      this._setStatus("Erreur réseau. Vérifiez votre connexion.")
+      this._retryValue = value
       this.retryBtnTarget.classList.remove("hidden")
     }
   }
@@ -147,9 +175,11 @@ export default class extends Controller {
     document.dispatchEvent(new CustomEvent("scanner:open-panel"))
   }
 
-  _showManual(message, value = "") {
+  _showManual(message, value = "", inputMode = "numeric", placeholder = "ex : 0602435688435") {
     this._setStatus(message)
     this.manualInputTarget.value = value
+    this.manualInputTarget.inputMode = inputMode
+    this.manualInputTarget.placeholder = placeholder
     this.manualFormTarget.classList.remove("hidden")
     this.manualInputTarget.focus()
   }
@@ -165,6 +195,11 @@ export default class extends Controller {
     this.statusTarget.textContent = text
   }
 
+  _setModeActive(mode) {
+    this.barcodeTabTarget.classList.toggle("active", mode === "barcode")
+    this.catnoTabTarget.classList.toggle("active", mode === "catno")
+  }
+
   _showOverlay() {
     this.overlayTarget.classList.add("scanner-open")
     document.body.classList.add("scanner-active")
@@ -176,6 +211,6 @@ export default class extends Controller {
     this.manualFormTarget.classList.add("hidden")
     this.retryBtnTarget.classList.add("hidden")
     this._setStatus("")
-    this._retryBarcode = null
+    this._retryValue = null
   }
 }

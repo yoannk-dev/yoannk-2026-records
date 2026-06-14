@@ -24,7 +24,16 @@
     <% if user_signed_in? %>
       <div class="scanner-overlay" data-scanner-target="overlay">
         <div class="scanner-header">
-          <span class="scanner-title">Scan Barcode</span>
+          <div class="scanner-mode-tabs">
+            <button class="scanner-mode-tab active"
+                    data-scanner-target="barcodeTab"
+                    data-action="scanner#switchMode"
+                    data-mode="barcode">Barcode</button>
+            <button class="scanner-mode-tab"
+                    data-scanner-target="catnoTab"
+                    data-action="scanner#switchMode"
+                    data-mode="catno">Catalog #</button>
+          </div>
           <button class="icon-btn scanner-close-btn"
                   data-action="scanner#close"
                   aria-label="Close scanner">
@@ -50,15 +59,14 @@
                 data-scanner-target="manualForm"
                 data-action="submit->scanner#submitManual">
             <div class="form-field">
-              <label for="scanner-barcode-input">Barcode</label>
-              <input id="scanner-barcode-input"
+              <label for="scanner-manual-input">Référence</label>
+              <input id="scanner-manual-input"
                      type="text"
                      inputmode="numeric"
-                     pattern="[0-9]*"
-                     placeholder="e.g. 0602435688435"
+                     placeholder="ex : 0602435688435"
                      data-scanner-target="manualInput">
             </div>
-            <button type="submit" class="btn btn-primary">Look up</button>
+            <button type="submit" class="btn btn-primary">Rechercher</button>
           </form>
 
           <button class="btn btn-ghost hidden"

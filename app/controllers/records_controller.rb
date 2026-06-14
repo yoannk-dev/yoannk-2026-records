@@ -55,13 +55,18 @@ class RecordsController < ApplicationController
     authenticate_user!
 
     barcode = params[:barcode].to_s.strip
-    return render(json: { error: "invalid_barcode" }, status: :bad_request) if barcode.blank?
+    catno   = params[:catno].to_s.strip
+    return render(json: { error: "invalid_input" }, status: :bad_request) if barcode.blank? && catno.blank?
 
     token = ENV["DISCOGS_TOKEN"]
     return render(json: { error: "not_configured" }, status: :service_unavailable) if token.blank?
 
+    search_params = { token: token, per_page: 1 }
+    search_params[:barcode] = barcode if barcode.present?
+    search_params[:catno]   = catno   if catno.present?
+
     uri = URI("https://api.discogs.com/database/search")
-    uri.query = URI.encode_www_form(barcode: barcode, token: token, per_page: 1)
+    uri.query = URI.encode_www_form(search_params)
 
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 5, read_timeout: 10) do |http|
       req = Net::HTTP::Get.new(uri)
@@ -72,9 +77,7 @@ class RecordsController < ApplicationController
     data    = JSON.parse(response.body)
     results = data["results"] || []
 
-    if results.empty?
-      return render(json: { error: "not_found" }, status: :not_found)
-    end
+    return render(json: { error: "not_found" }, status: :not_found) if results.empty?
 
     result      = results.first
     title_parts = result["title"].to_s.split(" - ", 2)
@@ -90,7 +93,7 @@ class RecordsController < ApplicationController
       cover_image_url: result["cover_image"],
       format:          result["format"]&.first,
       catalog_number:  result["catno"],
-      barcode:         barcode
+      barcode:         barcode.presence || result["barcode"]&.first
     }
   rescue StandardError
     render json: { error: "network_error" }, status: :service_unavailable

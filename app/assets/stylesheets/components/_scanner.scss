@@ -33,10 +33,33 @@
   flex-shrink: 0;
 }
 
-.scanner-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
+.scanner-mode-tabs {
+  display: flex;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.scanner-mode-tab {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+  }
+
+  &:not(.active):hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
 }
 
 .scanner-close-btn {
