@@ -89,6 +89,31 @@
   flex: none;
 }
 
+// Hide the topbar "Add new" button on mobile — the FAB in the layout takes over
+// (.btn.btn-topbar-add beats .btn alone, which comes later in the cascade from _buttons.scss)
+.btn.btn-topbar-add {
+  @include respond-to("mobile") { display: none; }
+}
+
+// Floating action button — mobile only, rendered in application.html.erb
+// (outside .topbar so backdrop-filter doesn't trap its fixed position)
+.btn-fab {
+  display: none;
+
+  @include respond-to("mobile") {
+    display: inline-flex;
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    z-index: 50;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+}
+
 .login-link {
   font-size: 12px;
   font-weight: 500;
