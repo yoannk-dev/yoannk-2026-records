@@ -105,6 +105,10 @@
 
 .panel-disc-out {
   transform: translateX(128px);
+
+  @include respond-to("mobile") {
+    transform: translateX(70px);
+  }
 }
 
 // --- Vinyl disc anatomy ---
