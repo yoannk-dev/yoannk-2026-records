@@ -151,12 +151,20 @@ class RecordsController < ApplicationController
     )
 
     if @record.save
-      current_user.user_records.create!(
+      @user_record = current_user.user_records.create!(
         record:    @record,
         condition: cp[:condition].presence,
         added_at:  Time.current
       )
-      redirect_to @record, notice: "Added to your collection."
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.prepend("records-grid", partial: "records/record", locals: { record: @record }),
+            turbo_stream.replace("panel_content", template: "records/show")
+          ]
+        end
+        format.html { redirect_to @record, notice: "Added to your collection." }
+      end
     else
       @label_name = cp[:label_name]
       @condition  = cp[:condition]
