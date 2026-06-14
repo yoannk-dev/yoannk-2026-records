@@ -12,16 +12,6 @@
   </nav>
 
   <div class="topbar-actions">
-    <button class="icon-btn"
-            data-action="theme#toggle"
-            aria-label="Toggle theme"
-            title="Toggle theme">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-        <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
-              stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-      </svg>
-    </button>
-
     <% if user_signed_in? %>
       <button class="btn btn-primary btn-topbar-add" data-action="scanner#open">
         <svg width="13" height="13" viewBox="0 0 14 14" style="margin-right:7px">

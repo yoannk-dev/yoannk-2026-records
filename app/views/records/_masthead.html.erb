@@ -9,13 +9,17 @@
     </span>
   </h1>
   <div class="masthead-meta">
-    <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
-    <% last = @owner&.user_records&.order(added_at: :desc)&.first %>
-    <% if last %>
-      <div>last added <%= last.added_at&.strftime("%-d %b %Y") %></div>
-    <% end %>
-    <% unless user_signed_in? %>
-      <%= link_to "Login", new_user_session_path, class: "login-link", data: { turbo: false } %>
-    <% end %>
+    <div class="masthead-controls">
+      <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
+      <button class="icon-btn"
+              data-action="theme#toggle"
+              aria-label="Toggle theme"
+              title="Toggle theme">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
+                stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
 </header>
