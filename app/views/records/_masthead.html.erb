@@ -14,5 +14,8 @@
     <% if last %>
       <div>last added <%= last.added_at&.strftime("%-d %b %Y") %></div>
     <% end %>
+    <% unless user_signed_in? %>
+      <%= link_to "Login", new_user_session_path, class: "login-link", data: { turbo: false } %>
+    <% end %>
   </div>
 </header>
