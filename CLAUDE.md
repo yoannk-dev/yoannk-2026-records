@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Single-owner vinyl collection app. One seeded user; public can browse, only the owner can add records.
+Single-owner vinyl collection app. Public can browse, only the owner can add records.
 
 ## Commands
 
@@ -15,7 +15,6 @@ bin/bundler-audit                 # CVE audit
 
 bin/rails dartsass:build          # One-off SCSS compile → app/assets/builds/application.css
 bin/rails db:migrate
-bin/rails db:seed                 # Owner user + 18 seed records
 bin/rails console
 ```
 
@@ -39,7 +38,6 @@ All three share the primary database; tables are in standard migrations / `db/sc
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DISCOGS_TOKEN` | Yes (owner features) | Discogs API auth for lookup + tracklist |
-| `SEED_PASSWORD` | No | Owner account password (default: `changeme123`) |
 | `RAILS_MASTER_KEY` | Yes (production) | Credentials decryption |
 
 ## Routing
@@ -99,7 +97,6 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `app/assets/stylesheets/application.scss` | SCSS entry point (imports only) |
 | `app/assets/stylesheets/abstracts/` | `_variables.scss` (tokens) · `_mixins.scss` (respond-to, reduced-motion) |
 | `app/assets/stylesheets/components/` | One file per UI block |
-| `db/seeds.rb` | Owner user + 18 seed records |
 
 ## Stimulus controllers
 
