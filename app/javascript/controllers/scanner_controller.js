@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn", "barcodeTab", "catnoTab"]
+  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn", "barcodeTab", "catnoTab", "manualBtn"]
   static values = { lookupUrl: String, tracklistUrl: String }
 
   connect() {
@@ -21,33 +21,12 @@ export default class extends Controller {
   async open() {
     this._mode = "barcode"
     this._setModeActive("barcode")
+    this.manualFormTarget.classList.add("hidden")
+    this.manualBtnTarget.classList.add("hidden")
+    this.retryBtnTarget.classList.add("hidden")
+    this._setStatus("")
     this._showOverlay()
-
-    if (!("BarcodeDetector" in window)) {
-      try {
-        const { BarcodeDetector } = await import("barcode-detector")
-        window.BarcodeDetector = BarcodeDetector
-      } catch {
-        this._showManual("Votre navigateur ne supporte pas le scan. Entrez le code-barres ci-dessous :")
-        return
-      }
-    }
-
-    try {
-      this._stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      })
-      this.videoTarget.srcObject = this._stream
-      await this.videoTarget.play()
-      this._detector = new window.BarcodeDetector({
-        formats: ["ean_13", "upc_a", "upc_e", "ean_8"]
-      })
-      this._setStatus("Scan en cours… pointez la caméra vers le code-barres")
-      this._scanning = true
-      this._scanLoop()
-    } catch {
-      this._showManual("Accès caméra refusé. Entrez le code-barres manuellement :")
-    }
+    await this._startCamera()
   }
 
   close() {
@@ -63,12 +42,22 @@ export default class extends Controller {
     this._stopCamera()
     this.retryBtnTarget.classList.add("hidden")
     this._retryValue = null
+    this.manualFormTarget.classList.add("hidden")
+    this.manualBtnTarget.classList.add("hidden")
+    this._setStatus("")
+    await this._startCamera()
+  }
 
-    if (mode === "catno") {
-      this._showManual("Entrez le numéro de catalogue inscrit sur l'étiquette :", "", "text", "ex : BLP 1568, ECM 1064")
-    } else {
-      this._showManual("Entrez le code-barres manuellement :", "", "numeric", "ex : 0602435688435")
-    }
+  showManual() {
+    this._stopCamera()
+    const isBarcode = this._mode === "barcode"
+    this.manualInputTarget.inputMode = isBarcode ? "numeric" : "text"
+    this.manualInputTarget.placeholder = isBarcode ? "ex : 0602435688435" : "ex : BLP 1568, ECM 1064"
+    this.manualInputTarget.value = ""
+    this._setStatus(isBarcode ? "Entrez le code-barres manuellement :" : "Entrez le numéro de catalogue inscrit sur l'étiquette :")
+    this.manualFormTarget.classList.remove("hidden")
+    this.manualBtnTarget.classList.add("hidden")
+    this.manualInputTarget.focus()
   }
 
   async submitManual(event) {
@@ -80,6 +69,47 @@ export default class extends Controller {
   async retry() {
     this.retryBtnTarget.classList.add("hidden")
     if (this._retryValue) await this._lookup(this._retryValue)
+  }
+
+  async _startCamera() {
+    if (this._mode === "barcode" && !("BarcodeDetector" in window)) {
+      try {
+        const { BarcodeDetector } = await import("barcode-detector")
+        window.BarcodeDetector = BarcodeDetector
+      } catch {
+        this._showManual("Votre navigateur ne supporte pas le scan. Entrez le code-barres ci-dessous :")
+        return
+      }
+    }
+
+    try {
+      this._stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      })
+      this.videoTarget.srcObject = this._stream
+      await this.videoTarget.play()
+
+      if (this._mode === "barcode") {
+        this._detector = new window.BarcodeDetector({
+          formats: ["ean_13", "upc_a", "upc_e", "ean_8"]
+        })
+        this._setStatus("Scan en cours… pointez la caméra vers le code-barres")
+        this._scanning = true
+        this._scanLoop()
+      } else {
+        this._setStatus("Pointez la caméra vers l'étiquette du disque")
+      }
+
+      this.manualBtnTarget.classList.remove("hidden")
+    } catch {
+      const isBarcode = this._mode === "barcode"
+      this._showManual(
+        isBarcode ? "Accès caméra refusé. Entrez le code-barres manuellement :" : "Accès caméra refusé. Entrez le numéro de catalogue :",
+        "",
+        isBarcode ? "numeric" : "text",
+        isBarcode ? "ex : 0602435688435" : "ex : BLP 1568, ECM 1064"
+      )
+    }
   }
 
   async _scanLoop() {
@@ -117,6 +147,7 @@ export default class extends Controller {
   async _lookup(value) {
     this._setStatus("Recherche sur Discogs…")
     this.manualFormTarget.classList.add("hidden")
+    this.manualBtnTarget.classList.add("hidden")
 
     const param = this._mode === "catno" ? "catno" : "barcode"
 
@@ -181,6 +212,7 @@ export default class extends Controller {
     this.manualInputTarget.inputMode = inputMode
     this.manualInputTarget.placeholder = placeholder
     this.manualFormTarget.classList.remove("hidden")
+    this.manualBtnTarget.classList.add("hidden")
     this.manualInputTarget.focus()
   }
 
@@ -209,6 +241,7 @@ export default class extends Controller {
     this.overlayTarget.classList.remove("scanner-open")
     document.body.classList.remove("scanner-active")
     this.manualFormTarget.classList.add("hidden")
+    this.manualBtnTarget.classList.add("hidden")
     this.retryBtnTarget.classList.add("hidden")
     this._setStatus("")
     this._retryValue = null

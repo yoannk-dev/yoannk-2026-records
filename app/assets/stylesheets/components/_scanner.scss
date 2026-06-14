@@ -178,6 +178,17 @@
   z-index: 1;
 }
 
+.scanner-body .btn-ghost {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+}
+
 // Utility used by scanner controller
 .hidden {
   display: none !important;

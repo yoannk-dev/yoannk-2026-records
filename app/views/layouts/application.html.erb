@@ -55,6 +55,12 @@
 
           <p class="scanner-status" data-scanner-target="status"></p>
 
+          <button class="btn btn-ghost scanner-manual-toggle hidden"
+                  data-scanner-target="manualBtn"
+                  data-action="scanner#showManual">
+            Ajout manuel
+          </button>
+
           <form class="scanner-manual hidden"
                 data-scanner-target="manualForm"
                 data-action="submit->scanner#submitManual">
