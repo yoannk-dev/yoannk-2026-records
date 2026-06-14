@@ -6,7 +6,7 @@
        (sides[side] ||= []) << t["title"].to_s
      end
    end %>
-<% all_tracks = [ *tl&.dig("a"), *tl&.dig("b") ].compact %>
+<% all_tracks = tl&.sort&.flat_map(&:last) || [] %>
 <% if all_tracks.any? %>
   <div class="tracklist">
     <div class="side-label">Tracklist</div>
