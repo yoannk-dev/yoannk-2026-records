@@ -55,6 +55,12 @@
 
           <p class="scanner-status" data-scanner-target="status"></p>
 
+          <button class="btn btn-primary hidden"
+                  data-scanner-target="captureBtn"
+                  data-action="scanner#capture">
+            Capturer
+          </button>
+
           <button class="btn btn-ghost scanner-manual-toggle hidden"
                   data-scanner-target="manualBtn"
                   data-action="scanner#showManual">
@@ -80,6 +86,8 @@
                   data-action="scanner#retry">
             Retry
           </button>
+
+          <canvas data-scanner-target="canvas" style="display:none" aria-hidden="true"></canvas>
         </div>
       </div>
     <% end %>

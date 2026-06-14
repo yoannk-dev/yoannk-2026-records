@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn", "barcodeTab", "catnoTab", "manualBtn"]
+  static targets = ["overlay", "video", "status", "manualForm", "manualInput", "retryBtn", "barcodeTab", "catnoTab", "manualBtn", "captureBtn", "canvas"]
   static values = { lookupUrl: String, tracklistUrl: String }
 
   connect() {
@@ -12,10 +12,14 @@ export default class extends Controller {
     this._lastCandidate = null
     this._candidateCount = 0
     this._mode = "barcode"
+    this._tesseractWorker = null
+    this._tesseractLoading = null
   }
 
   disconnect() {
     this._stopCamera()
+    this._tesseractWorker?.terminate()
+    this._tesseractWorker = null
   }
 
   async open() {
@@ -24,6 +28,7 @@ export default class extends Controller {
     this.manualFormTarget.classList.add("hidden")
     this.manualBtnTarget.classList.add("hidden")
     this.retryBtnTarget.classList.add("hidden")
+    this.captureBtnTarget.classList.add("hidden")
     this._setStatus("")
     this._showOverlay()
     await this._startCamera()
@@ -44,12 +49,14 @@ export default class extends Controller {
     this._retryValue = null
     this.manualFormTarget.classList.add("hidden")
     this.manualBtnTarget.classList.add("hidden")
+    this.captureBtnTarget.classList.add("hidden")
     this._setStatus("")
     await this._startCamera()
   }
 
   showManual() {
     this._stopCamera()
+    this.captureBtnTarget.classList.add("hidden")
     const isBarcode = this._mode === "barcode"
     this.manualInputTarget.inputMode = isBarcode ? "numeric" : "text"
     this.manualInputTarget.placeholder = isBarcode ? "ex : 0602435688435" : "ex : BLP 1568, ECM 1064"
@@ -69,6 +76,36 @@ export default class extends Controller {
   async retry() {
     this.retryBtnTarget.classList.add("hidden")
     if (this._retryValue) await this._lookup(this._retryValue)
+  }
+
+  async capture() {
+    this._stopCamera()
+    this.captureBtnTarget.classList.add("hidden")
+    this.manualBtnTarget.classList.add("hidden")
+    this._setStatus("Lecture en cours…")
+
+    const canvas = this.canvasTarget
+    canvas.width = this.videoTarget.videoWidth
+    canvas.height = this.videoTarget.videoHeight
+    canvas.getContext("2d").drawImage(this.videoTarget, 0, 0)
+
+    try {
+      const worker = await this._loadTesseract()
+      const { data: { text } } = await worker.recognize(canvas)
+      const cleaned = text.trim().replace(/\s+/g, " ")
+
+      this.manualInputTarget.inputMode = "text"
+      this.manualInputTarget.placeholder = "ex : BLP 1568, ECM 1064"
+      this.manualInputTarget.value = cleaned
+      this._setStatus("Vérifiez et corrigez si besoin :")
+      this.manualFormTarget.classList.remove("hidden")
+      this.manualInputTarget.focus()
+      this.manualInputTarget.select()
+    } catch {
+      this._setStatus("Impossible de lire le texte. Réessayez.")
+      this.captureBtnTarget.classList.remove("hidden")
+      this.manualBtnTarget.classList.remove("hidden")
+    }
   }
 
   async _startCamera() {
@@ -96,11 +133,13 @@ export default class extends Controller {
         this._setStatus("Scan en cours… pointez la caméra vers le code-barres")
         this._scanning = true
         this._scanLoop()
+        this.manualBtnTarget.classList.remove("hidden")
       } else {
-        this._setStatus("Pointez la caméra vers l'étiquette du disque")
+        this._setStatus("Pointez la caméra vers l'étiquette et appuyez sur Capturer")
+        this.captureBtnTarget.classList.remove("hidden")
+        this.manualBtnTarget.classList.remove("hidden")
+        this._loadTesseract().catch(() => {})
       }
-
-      this.manualBtnTarget.classList.remove("hidden")
     } catch {
       const isBarcode = this._mode === "barcode"
       this._showManual(
@@ -144,10 +183,27 @@ export default class extends Controller {
     if (this._scanning) requestAnimationFrame(() => this._scanLoop())
   }
 
+  async _loadTesseract() {
+    if (this._tesseractWorker) return this._tesseractWorker
+    if (!this._tesseractLoading) {
+      this._tesseractLoading = (async () => {
+        const { createWorker } = await import("tesseract.js")
+        this._tesseractWorker = await createWorker("eng", 1, {
+          workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
+          langPath: "https://tessdata.projectnaptha.com/4.0.0",
+          corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/",
+        })
+      })()
+    }
+    await this._tesseractLoading
+    return this._tesseractWorker
+  }
+
   async _lookup(value) {
     this._setStatus("Recherche sur Discogs…")
     this.manualFormTarget.classList.add("hidden")
     this.manualBtnTarget.classList.add("hidden")
+    this.captureBtnTarget.classList.add("hidden")
 
     const param = this._mode === "catno" ? "catno" : "barcode"
 
@@ -213,6 +269,7 @@ export default class extends Controller {
     this.manualInputTarget.placeholder = placeholder
     this.manualFormTarget.classList.remove("hidden")
     this.manualBtnTarget.classList.add("hidden")
+    this.captureBtnTarget.classList.add("hidden")
     this.manualInputTarget.focus()
   }
 
@@ -243,6 +300,7 @@ export default class extends Controller {
     this.manualFormTarget.classList.add("hidden")
     this.manualBtnTarget.classList.add("hidden")
     this.retryBtnTarget.classList.add("hidden")
+    this.captureBtnTarget.classList.add("hidden")
     this._setStatus("")
     this._retryValue = null
   }
