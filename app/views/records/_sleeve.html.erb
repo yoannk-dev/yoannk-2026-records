@@ -1,18 +1,10 @@
 <%# locals: (record:, radius: nil, size: nil) %>
-<% style = "background:#{record.cover_bg};" %>
+<% style = "" %>
 <% style += "border-radius:#{radius}px;" if radius %>
 <% style += "width:#{size}px;height:#{size}px;" if size %>
 
 <div class="sleeve" style="<%= style %>">
-  <% if record.cover_image_url.present? %>
-    <img src="<%= record.cover_image_url %>"
-         alt="<%= record.artist %> – <%= record.title %>"
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-  <% elsif record.cover_motif == "type" %>
-    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:<%= record.cover_fg %>;font-weight:800;font-size:52cqw;letter-spacing:-0.04em;line-height:1;user-select:none">
-      <%= record.artist.first %>
-    </div>
-  <% else %>
-    <%= sleeve_motif_tag(record.cover_motif, record.cover_fg) %>
-  <% end %>
+  <img src="<%= record.cover_image_url %>"
+       alt="<%= record.artist %> – <%= record.title %>"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
 </div>

@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_120928) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "labels", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -26,10 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_120928) do
     t.string "barcode"
     t.string "catalog_number"
     t.string "country"
-    t.string "cover_bg"
-    t.string "cover_fg"
     t.string "cover_image_url"
-    t.string "cover_motif"
     t.datetime "created_at", null: false
     t.string "discogs_id"
     t.string "format"

@@ -65,7 +65,7 @@ end
 labels        — name (unique)
 records       — artist, title, label_id, year, format, genre, country,
                 catalog_number, barcode, cover_image_url,
-                cover_bg, cover_fg, cover_motif, tracklist (jsonb), discogs_id
+                tracklist (jsonb), discogs_id
 user_records  — user_id, record_id, condition, added_at   ← the collection join table
 users         — Devise (database_authenticatable, rememberable, validatable)
 ```
@@ -73,8 +73,6 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 `User.first` is always the owner. `user_records` links users to records with condition/date.
 
 ## Key conventions
-
-**Procedural covers** — when `cover_image_url` is blank, a CSS-only sleeve is rendered via `SleevesHelper#sleeve_motif_tag`. Three columns drive it: `cover_bg` (hex), `cover_fg` (hex), `cover_motif` (`rings` `circle` `split` `band` `dots` `diag` `lines` `grid` `type`).
 
 **Tracklist format** — stored as a JSONB hash keyed by lowercase side letter: `{ "a" => ["Track 1", …], "b" => […], "c" => […] }`. Any number of sides is supported. The panel partial iterates `tl.sort.flat_map(&:last)`.
 
@@ -87,8 +85,7 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | Path | Purpose |
 |------|---------|
 | `app/controllers/records_controller.rb` | index, show, new (Discogs pre-fill), create, discogs_lookup, discogs_tracklist |
-| `app/helpers/sleeves_helper.rb` | `sleeve_motif_tag` |
-| `app/views/records/_sleeve.html.erb` | Procedural cover partial |
+| `app/views/records/_sleeve.html.erb` | Album cover image wrapper |
 | `app/views/records/_record.html.erb` | Grid cell |
 | `app/views/records/_masthead.html.erb` | Hero header with animated disc + stats |
 | `app/views/records/_topbar.html.erb` | Genre filter chips + action buttons |

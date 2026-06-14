@@ -21,6 +21,14 @@
   flex-direction: column;
 }
 
+.sleeve {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
 .cell-btn {
   position: relative;
   display: block;
