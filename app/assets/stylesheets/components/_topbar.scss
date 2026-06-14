@@ -73,13 +73,17 @@
   transition: color 0.15s, background 0.15s;
 
   &:hover {
-    color: var(--ink);
+    color: var(--accent);
   }
 }
 
 .chip-active {
   color: var(--bg);
   background: var(--ink);
+
+  &:hover {
+    color: var(--bg);
+  }
 }
 
 .topbar-actions {
