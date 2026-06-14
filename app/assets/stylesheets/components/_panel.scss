@@ -1,7 +1,7 @@
 @use "../abstracts/mixins" as *;
 
 // ==========================================================================
-// Panel — slide-in detail view, vinyl disc, metadata, tracklist, barcode
+// Panel — slide-in detail view, vinyl disc, metadata, tracklist
 // ==========================================================================
 
 // --- Scrim overlay ---
@@ -240,29 +240,6 @@
 }
 
 // --- Barcode ---
-
-.panel-barcode {
-  margin-bottom: 22px;
-  color: var(--ink);
-}
-
-.barcode {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.barcode-bars {
-  display: flex;
-  align-items: stretch;
-}
-
-.barcode-digits {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-}
 
 // --- Actions and footer ---
 

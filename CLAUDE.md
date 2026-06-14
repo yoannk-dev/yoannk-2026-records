@@ -1,113 +1,117 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Single-owner vinyl collection app. One seeded user; public can browse, only the owner can add records.
 
 ## Commands
 
 ```bash
 bin/setup          # Install deps, create and migrate the database
-bin/dev            # Start development server (Puma + asset watcher)
-bin/ci             # Run the full CI suite (linting, security audits — no tests yet)
+bin/dev            # Start dev server (Puma + dartsass watcher)
+bin/ci             # Lint + security audit (no test suite yet)
 
-bin/rubocop        # Lint Ruby (rails-omakase style)
-bin/brakeman --quiet --no-pager  # Static security analysis
-bin/bundler-audit  # Audit gems for known CVEs
+bin/rubocop -a                    # Lint + auto-correct (rails-omakase style)
+bin/brakeman --quiet --no-pager   # Static security analysis
+bin/bundler-audit                 # CVE audit
 
-bin/rails dartsass:build      # One-off SCSS compile → app/assets/builds/application.css
-bin/rails dartsass:watch      # Watch + recompile on change (bin/dev runs this automatically)
-
-bin/rails db:migrate          # Run pending migrations
-bin/rails db:migrate RAILS_ENV=test
-bin/rails db:seed             # Create owner user + 18 seed records
-bin/rails console             # Rails REPL
+bin/rails dartsass:build          # One-off SCSS compile → app/assets/builds/application.css
+bin/rails db:migrate
+bin/rails db:seed                 # Owner user + 18 seed records
+bin/rails console
 ```
 
-No test suite is wired up yet (`rails/test_unit/railtie` is commented out in `config/application.rb`).
+No test suite (`rails/test_unit/railtie` is commented out in `config/application.rb`).
 
-## Architecture
+## Stack
 
-**Stack:** Rails 8.1 · Ruby 3.3.5 · PostgreSQL · Propshaft · Importmap · Hotwire (Turbo + Stimulus)
+**Backend:** Rails 8.1 · Ruby 3.3.5 · PostgreSQL  
+**Frontend:** Importmap (no build step) · Hotwire (Turbo + Stimulus) · Propshaft · SCSS via `dartsass-rails`  
+**Deployment:** Kamal — amd64 Docker image, local registry at `localhost:5555`, server at `192.168.0.1`. `RAILS_MASTER_KEY` is the only runtime secret.
 
-**Database-backed adapters** — no Redis or external queue broker needed:
+**Database-backed adapters** (no Redis):
 - `solid_cache` — Rails.cache
-- `solid_queue` — Active Job (runs inside Puma via `SOLID_QUEUE_IN_PUMA=true`; split to `bin/jobs` process for multi-server setups)
+- `solid_queue` — Active Job (runs inside Puma via `SOLID_QUEUE_IN_PUMA=true`)
 - `solid_cable` — Action Cable
 
-**Single database setup:** all three Solid adapters share the primary database. Their tables are managed via standard migrations in `db/migrate/` and reflected in `db/schema.rb`.
+All three share the primary database; tables are in standard migrations / `db/schema.rb`.
 
-**Frontend:** JavaScript is managed via importmap (no build step). Stimulus controllers live in `app/javascript/controllers/`. Assets served by Propshaft. CSS is authored in SCSS (`dartsass-rails`) and compiled to `app/assets/builds/application.css`.
+## Environment variables
 
-**Deployment:** Kamal (`config/deploy.yml`) — builds an amd64 Docker image, pushes to a local registry at `localhost:5555`, and deploys to the server at `192.168.0.1`. `RAILS_MASTER_KEY` is the only secret injected at runtime.
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DISCOGS_TOKEN` | Yes (owner features) | Discogs API auth for lookup + tracklist |
+| `SEED_PASSWORD` | No | Owner account password (default: `changeme123`) |
+| `RAILS_MASTER_KEY` | Yes (production) | Credentials decryption |
 
-**Style:** Rubocop enforces [rails-omakase](https://github.com/rails/rubocop-rails-omakase) rules (see `.rubocop.yml`). Run `bin/rubocop -a` to auto-correct.
+## Routing
 
----
+`GET /` is the only collection URL (`records#index`). `/records` does **not** exist.  
+Always use `root_path`, never `records_path`, for collection links and pagination.
 
-## Domain
+```ruby
+root "records#index"
+resources :records, only: [:show, :create] do
+  collection do
+    get :new                 # confirm form pre-filled from Discogs
+    get :discogs_lookup      # → /records/discogs_lookup?barcode= or ?catno=
+    get :discogs_tracklist   # → /records/discogs_tracklist?discogs_id=
+  end
+end
+# Auth: GET/POST /login, DELETE /logout (custom devise_for paths)
+```
 
-**Single-owner vinyl collection app.** One user (seeded, no registration). Public can browse; only the owner can add records.
-
-**Routing:** `GET /` is the only collection URL (`records#index`). `/records` does not exist — `resources :records` exposes only `:show` and `:create`. Use `root_path` (not `records_path`) for collection links and pagination.
-
-### Data model
+## Data model
 
 ```
-labels          — name (unique)
-records         — artist, title, label_id, year, format, genre, country,
-                  catalog_number, barcode, cover_image_url,
-                  cover_bg, cover_fg, cover_motif, tracklist (jsonb),
-                  discogs_id
-user_records    — user_id, record_id, condition, added_at  ← the collection
-users           — Devise (email + bcrypt password, no registration/recovery)
+labels        — name (unique)
+records       — artist, title, label_id, year, format, genre, country,
+                catalog_number, barcode, cover_image_url,
+                cover_bg, cover_fg, cover_motif, tracklist (jsonb), discogs_id
+user_records  — user_id, record_id, condition, added_at   ← the collection join table
+users         — Devise (database_authenticatable, rememberable, validatable)
 ```
 
-`user_records` is the collection join table. `User.first` is always the owner.
+`User.first` is always the owner. `user_records` links users to records with condition/date.
 
-### Procedural covers
+## Key conventions
 
-When `cover_image_url` is blank, records display a CSS-only procedural sleeve. Cover data is stored in three columns: `cover_bg` (background hex), `cover_fg` (foreground hex), `cover_motif` (one of `rings`, `circle`, `split`, `band`, `dots`, `diag`, `lines`, `grid`, `type`). Rendered server-side in `app/views/records/_sleeve.html.erb` via `SleevesHelper#sleeve_motif_tag`.
+**Procedural covers** — when `cover_image_url` is blank, a CSS-only sleeve is rendered via `SleevesHelper#sleeve_motif_tag`. Three columns drive it: `cover_bg` (hex), `cover_fg` (hex), `cover_motif` (`rings` `circle` `split` `band` `dots` `diag` `lines` `grid` `type`).
 
-### Key files
+**Tracklist format** — stored as a JSONB hash keyed by lowercase side letter: `{ "a" => ["Track 1", …], "b" => […], "c" => […] }`. Any number of sides is supported. The panel partial iterates `tl.sort.flat_map(&:last)`.
+
+**Panel / Turbo Frame** — the detail panel and the add-record form both render inside `<turbo-frame id="panel_content">`. The `panel` Stimulus controller lives on `<body>` (must be ancestor of both the grid and the panel aside). It pushes URL via `history.pushState` and restores the genre filter on close.
+
+**Auth** — login form uses `data-turbo="false"` to bypass Turbo fetch (avoids CSRF/header mismatch with Devise). No registration or password reset.
+
+## Key files
 
 | Path | Purpose |
 |------|---------|
-| `app/controllers/records_controller.rb` | index (paginated, genre filter), show (panel content) |
-| `app/helpers/sleeves_helper.rb` | `sleeve_motif_tag`, `barcode_html` |
+| `app/controllers/records_controller.rb` | index, show, new (Discogs pre-fill), create, discogs_lookup, discogs_tracklist |
+| `app/helpers/sleeves_helper.rb` | `sleeve_motif_tag` |
 | `app/views/records/_sleeve.html.erb` | Procedural cover partial |
 | `app/views/records/_record.html.erb` | Grid cell |
-| `app/views/records/_masthead.html.erb` | Hero header with animated disc and collection stats |
-| `app/views/records/_topbar.html.erb` | Sticky bar with genre filter chips and action buttons |
-| `app/views/records/_panel_cover.html.erb` | Vinyl disc + sleeve cover shown in the detail panel |
-| `app/views/records/_panel_meta.html.erb` | Label / Cat # / Format / Condition metadata grid |
-| `app/views/records/_panel_tracklist.html.erb` | Side A / Side B tracklists |
-| `app/views/records/show.html.erb` | Panel content (inside `<turbo-frame id="panel_content">`) |
-| `app/views/layouts/application.html.erb` | Root layout; `data-controller="panel"` is on `<body>` |
-| `app/views/layouts/_flash.html.erb` | Notice / alert flash messages |
+| `app/views/records/_masthead.html.erb` | Hero header with animated disc + stats |
+| `app/views/records/_topbar.html.erb` | Genre filter chips + action buttons |
+| `app/views/records/_panel_cover.html.erb` | Vinyl disc + sleeve in the detail panel |
+| `app/views/records/_panel_meta.html.erb` | Label / Cat # / Format / Condition grid |
+| `app/views/records/_panel_tracklist.html.erb` | Multi-side tracklist (A, B, C, D…) |
+| `app/views/records/show.html.erb` | Record detail inside `<turbo-frame id="panel_content">` |
+| `app/views/records/new.html.erb` | Add-record form (Discogs pre-filled) inside same turbo-frame |
+| `app/views/layouts/application.html.erb` | Root layout — `data-controller="panel"` on `<body>` |
 | `app/views/layouts/_panel.html.erb` | Scrim overlay + panel aside |
-| `app/assets/stylesheets/application.scss` | SCSS entry point — imports only |
-| `app/assets/stylesheets/abstracts/` | `_variables.scss` (CSS tokens) · `_mixins.scss` (respond-to, reduced-motion) |
-| `app/assets/stylesheets/base/` | `_reset.scss` · `_typography.scss` |
-| `app/assets/stylesheets/components/` | One file per UI block (masthead, topbar, buttons, grid, sleeve, panel, flash, forms, tooltip) |
-| `db/seeds.rb` | Owner user + 18 records |
+| `app/assets/stylesheets/application.scss` | SCSS entry point (imports only) |
+| `app/assets/stylesheets/abstracts/` | `_variables.scss` (tokens) · `_mixins.scss` (respond-to, reduced-motion) |
+| `app/assets/stylesheets/components/` | One file per UI block |
+| `db/seeds.rb` | Owner user + 18 seed records |
 
-### Stimulus controllers
+## Stimulus controllers
 
 | Controller | Responsibility |
 |-----------|---------------|
-| `panel` | Slide-in detail panel — on `<body>` (must be ancestor of both grid and panel aside). Opens on record link click, closes on Escape/scrim/close button. Pushes URL via `history.pushState`. On open, saves `window.location.search` (genre filter) so it can be restored to `root_path` on close. |
-| `panel-disc` | Adds `panel-disc-out` class 50 ms after connecting (triggers CSS slide animation). Lives inside the panel turbo-frame. |
+| `panel` | Slide-in detail panel on `<body>`. Opens on record click, closes on Escape / scrim / close button. Pushes URL, restores genre filter on close. |
+| `panel-disc` | Adds `panel-disc-out` class 50 ms after connect to trigger CSS slide animation. Lives inside the panel turbo-frame. |
+| `scanner` | Camera overlay with two modes — `barcode` (native `BarcodeDetector` + polyfill, requires 3 consecutive identical reads) and `catno` (manual entry). Calls `discogs_lookup` then `discogs_tracklist`, then loads `new.html.erb` into `panel_content`. Falls back to manual input on camera denial or unsupported browser. |
+| `add-prompt` | Shows login-link tooltip for guests; triggers `scanner#open` when logged in. |
 | `theme` | Toggles `data-theme` on `<html>`, persists to `localStorage`. |
-| `filter` | Syncs `chip-active` class with the current `?genre=` param on connect. |
+| `filter` | Syncs `chip-active` class with current `?genre=` param on connect. |
 | `infinite-scroll` | IntersectionObserver sentinel — fetches next page and appends `.cell` elements to `#records-grid`. |
-| `add-prompt` | Shows a login-link tooltip when guest clicks "Add new"; no-op when logged in (sprint 2 will open camera). |
-
-### Auth notes
-
-- Devise with only `:database_authenticatable, :rememberable, :validatable`. No registration, no password reset.
-- Routes: `GET/POST /login`, `DELETE /logout` (custom path names via `devise_for`).
-- Login form uses `data-turbo="false"` — bypasses Turbo fetch to avoid CSRF/header mismatch with Devise.
-- Owner seed password: `SEED_PASSWORD` env var, default `changeme123` (change in production).
-
-### Sprint 2 (not yet built)
-
-US-07–09: barcode scan via device camera (`@zxing/library`), Discogs API lookup (`GET /database/search?barcode=…&token=DISCOGS_TOKEN`), confirm + create record. `DISCOGS_TOKEN` must be in env.

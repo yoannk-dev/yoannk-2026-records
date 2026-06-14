@@ -29,26 +29,4 @@ module SleevesHelper
     end
   end
 
-  def barcode_html(code, height: 36)
-    digits = (code || "0000000000000").chars
-    bars = []
-    digits.each_with_index do |d, i|
-      n = d.to_i
-      bars << { w: (n % 3) + 1, on: true }
-      bars << { w: ((n + i) % 2) + 1, on: false }
-      bars << { w: (n / 3 % 2) + 1, on: true }
-      bars << { w: 1, on: false }
-    end
-
-    bar_divs = bars.map do |b|
-      tag.div style: "width:#{b[:w] * 1.5}px;background:#{b[:on] ? 'currentColor' : 'transparent'}"
-    end
-
-    tag.div class: "barcode" do
-      safe_join([
-        tag.div(safe_join(bar_divs), class: "barcode-bars", style: "height:#{height}px"),
-        tag.div(code, class: "barcode-digits")
-      ])
-    end
-  end
 end

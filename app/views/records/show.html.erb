@@ -22,12 +22,6 @@
 
     <%= render "panel_tracklist", record: @record %>
 
-    <% if @record.barcode.present? %>
-      <div class="panel-barcode">
-        <%= barcode_html(@record.barcode, height: 30) %>
-      </div>
-    <% end %>
-
     <div class="panel-actions">
       <% if @record.discogs_id.present? %>
         <%= link_to "https://www.discogs.com/release/#{@record.discogs_id}",
