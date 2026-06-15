@@ -94,9 +94,38 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `app/views/records/new.html.erb` | Add-record form (Discogs pre-filled) inside same turbo-frame |
 | `app/views/layouts/application.html.erb` | Root layout — `data-controller="panel"` on `<body>` |
 | `app/views/layouts/_panel.html.erb` | Scrim overlay + panel aside |
+| `app/javascript/helpers/fetch_json.js` | Shared JSON fetch wrapper — sets Accept header, throws on HTTP errors with `.status` attached, supports `AbortController` via `signal` option |
 | `app/assets/stylesheets/application.scss` | SCSS entry point (imports only) |
 | `app/assets/stylesheets/abstracts/` | `_variables.scss` (SCSS tokens + CSS custom properties) · `_mixins.scss` (flex, truncate, label-uppercase, respond-to, reduced-motion) |
 | `app/assets/stylesheets/components/` | One file per UI block |
+
+## JavaScript architecture
+
+```
+app/javascript/
+├── application.js              ← entry point (imports turbo-rails + controllers)
+├── controllers/                ← one file per Stimulus controller
+│   └── *_controller.js
+└── helpers/                    ← pure utility modules, no Stimulus dependency
+    └── fetch_json.js           ← fetchJSON(url, { signal }) — used by scanner
+```
+
+`config/importmap.rb` pins both folders:
+```ruby
+pin_all_from "app/javascript/controllers", under: "controllers"
+pin_all_from "app/javascript/helpers", under: "helpers"
+```
+
+**Conventions:**
+- ES2022 private class fields (`#field`, `#method()`) — no `_` underscore prefix
+- Event handlers that need stable references (for `removeEventListener`) are declared as **arrow class fields**: `#onX = () => { … }` — same reference, no `.bind()`
+- `initialize()` for one-time setup (runs once per controller instance even across Turbo reconnections); `connect()` for setup that must repeat on each reconnect
+- All controllers use `AbortController` for in-flight fetch cancellation in `disconnect()`
+
+**ARIA — pending HTML work** (controllers manage state, HTML must set the initial attributes):
+- Panel aside (`_panel.html.erb`): needs `aria-hidden="true"` initial, `role="dialog"`, `aria-modal="true"`
+- Scanner overlay: same — `aria-hidden="true"` initial, `role="dialog"`, `aria-modal="true"`
+- Scanner status element: needs `aria-live="polite" aria-atomic="true"` in HTML
 
 ## SCSS architecture
 
@@ -139,5 +168,5 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `scanner` | Camera overlay with two modes — `barcode` (native `BarcodeDetector` + polyfill, requires 3 consecutive identical reads) and `catno` (manual entry). Calls `discogs_lookup` then `discogs_tracklist`, then loads `new.html.erb` into `panel_content`. Falls back to manual input on camera denial or unsupported browser. |
 | `add-prompt` | Shows login-link tooltip for guests; triggers `scanner#open` when logged in. |
 | `theme` | Toggles `data-theme` on `<html>`, persists to `localStorage`. |
-| `filter` | Syncs `chip--active` class with current `?genre=` param on connect. |
+| `filter` | Syncs `chip--active` class and `aria-current="page"` with current `?genre=` param on connect. |
 | `infinite-scroll` | IntersectionObserver sentinel — fetches next page and appends `.cell` elements to `#records-grid`. |
