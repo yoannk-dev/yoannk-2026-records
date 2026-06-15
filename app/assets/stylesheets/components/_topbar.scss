@@ -8,10 +8,8 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 16px 28px;
+  @include flex(row, center, flex-start, $spacing-xl);
+  padding: $spacing-md $spacing-xl;
   background: var(--topbar);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -19,100 +17,92 @@
 
   @include respond-to("mobile") {
     gap: 0;
-    padding: 14px 16px;
+    padding: 14px $spacing-md;
     flex-wrap: wrap;
   }
-}
 
-.brand {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex: none;
-}
+  &__brand {
+    @include flex(row, baseline, flex-start, $spacing-sm);
+    flex: none;
+  }
 
-.wordmark {
-  font-weight: 800;
-  font-size: 17px;
-  letter-spacing: -0.02em;
-}
+  &__wordmark {
+    font-weight: $font-weight-extrabold;
+    font-size: $font-size-xl;
+    letter-spacing: -0.02em;
+  }
 
-.count {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-  white-space: nowrap;
+  &__count {
+    font-size: $font-size-sm;
+    color: var(--muted);
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+  }
+
+  &__filters {
+    @include flex(row, center, flex-start, $spacing-xxs);
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+
+    @include respond-to("mobile") {
+      order: 3;
+      flex-basis: 100%;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar { display: none; }
+    }
+  }
+
+  &__actions {
+    @include flex(row, center, flex-start, 10px);
+    flex: none;
+  }
 }
 
 // Genre filter chips
-.filters {
-  display: flex;
-  gap: 4px;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-
-  @include respond-to("mobile") {
-    order: 3;
-    flex-basis: 100%;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
-  }
-}
-
 .chip {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: var(--muted);
-  padding: 6px 12px;
-  border-radius: 999px;
+  padding: 6px $spacing-sm;
+  border-radius: $border-radius-pill;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.15s, background 0.15s;
+  transition: color $duration-fast, background $duration-fast;
 
-  &:hover {
-    color: var(--accent);
-  }
-}
+  &:hover { color: var(--accent); }
 
-.chip-active {
-  color: var(--bg);
-  background: var(--ink);
-
-  &:hover {
+  &--active {
     color: var(--bg);
+    background: var(--ink);
+
+    &:hover { color: var(--bg); }
   }
 }
 
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
-}
-
-// Hide the topbar "Add new" button on mobile — the FAB in the layout takes over
-// (.btn.btn-topbar-add beats .btn alone, which comes later in the cascade from _buttons.scss)
-.btn.btn-topbar-add {
+// Hide the topbar "Add" button on mobile — the FAB in the layout takes over
+// (.btn.btn--topbar-add beats .btn alone, which comes later in the cascade from _buttons.scss)
+.btn.btn--topbar-add {
   @include respond-to("mobile") { display: none; }
 }
 
 // Floating action button — mobile only, rendered in application.html.erb
 // (outside .topbar so backdrop-filter doesn't trap its fixed position)
-.btn-fab {
+.btn--fab {
   display: none;
 
   @include respond-to("mobile") {
     display: inline-flex;
     position: fixed;
-    bottom: 24px;
+    bottom: $spacing-lg;
     right: 20px;
     z-index: 50;
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: $border-radius-circle;
     padding: 0;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }

@@ -4,193 +4,175 @@
 // Scanner — full-screen camera overlay for barcode scanning
 // ==========================================================================
 
-.scanner-overlay {
+.scanner {
   position: fixed;
   inset: 0;
   z-index: 200;
   background: #000;
-  display: flex;
-  flex-direction: column;
+  @include flex(column, stretch, flex-start);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity $duration-base ease;
 
-  @include reduced-motion {
-    transition: none;
-  }
-}
+  @include reduced-motion { transition: none; }
 
-.scanner-open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.scanner-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  flex-shrink: 0;
-}
-
-.scanner-mode-tabs {
-  display: flex;
-  gap: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 3px;
-}
-
-.scanner-mode-tab {
-  padding: 5px 14px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &.active {
-    background: rgba(255, 255, 255, 0.18);
-    color: #fff;
+  &--open {
+    opacity: 1;
+    pointer-events: auto;
   }
 
-  &:not(.active):hover {
-    color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-.scanner-close-btn {
-  color: rgba(255, 255, 255, 0.7);
-
-  &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.12);
-  }
-}
-
-.scanner-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 20px;
-  padding: 0 24px 40px;
-  overflow-y: auto;
-  position: relative;
-}
-
-.scanner-viewfinder {
-  position: absolute;
-  inset: 0;
-}
-
-.scanner-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #111;
-  display: block;
-}
-
-.scanner-reticle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(280px, 70%);
-  height: 70px;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  border-radius: 4px;
-  pointer-events: none;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    border-style: solid;
-    border-color: #e8541e;
+  &__header {
+    @include flex(row, center, space-between);
+    padding: $spacing-md 20px;
+    flex-shrink: 0;
   }
 
-  &::before {
-    top: -2px;
-    left: -2px;
-    border-width: 3px 0 0 3px;
-    border-radius: 4px 0 0 0;
+  &__mode-tabs {
+    @include flex(row, center, flex-start, 2px);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: $border-radius-md;
+    padding: 3px;
   }
 
-  &::after {
-    bottom: -2px;
-    right: -2px;
-    border-width: 0 3px 3px 0;
-    border-radius: 0 0 4px 0;
-  }
-}
-
-.scanner-status {
-  position: relative;
-  z-index: 1;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  text-align: center;
-  max-width: 320px;
-  line-height: 1.5;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 8px 16px;
-  border-radius: 20px;
-}
-
-.scanner-manual {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  padding: 8px 16px;
-  max-width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .form-field label {
+  &__mode-tab {
+    padding: 5px 14px;
+    border-radius: $border-radius-sm;
+    border: none;
+    background: transparent;
     color: rgba(255, 255, 255, 0.55);
-  }
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: background $duration-fast ease, color $duration-fast ease;
 
-  .form-field input {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
-    color: #fff;
-
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.3);
+    &.is-active {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
     }
 
-    &:focus {
-      border-color: rgba(255, 255, 255, 0.55);
+    &:not(.is-active):hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  &__close-btn {
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  &__body {
+    flex: 1;
+    @include flex(column, center, flex-end, 20px);
+    padding: 0 $spacing-lg 40px;
+    overflow-y: auto;
+    position: relative;
+
+    .btn {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn--ghost {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.85);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #fff;
+      }
+    }
+  }
+
+  &__viewfinder {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #111;
+    display: block;
+  }
+
+  &__reticle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(280px, 70%);
+    height: 70px;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    border-radius: $border-radius-xs;
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-style: solid;
+      border-color: var(--accent);
+    }
+
+    &::before {
+      top: -2px;
+      left: -2px;
+      border-width: 3px 0 0 3px;
+      border-radius: $border-radius-xs 0 0 0;
+    }
+
+    &::after {
+      bottom: -2px;
+      right: -2px;
+      border-width: 0 3px 3px 0;
+      border-radius: 0 0 $border-radius-xs 0;
+    }
+  }
+
+  &__status {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: $font-size-lg;
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.5;
+    background: rgba(0, 0, 0, 0.5);
+    padding: $spacing-xs $spacing-md;
+    border-radius: 20px;
+  }
+
+  &__manual {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: $spacing-xs $spacing-md;
+    max-width: 300px;
+    @include flex(column, stretch, flex-start, $spacing-sm);
+
+    .form-field label {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .form-field input {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #fff;
+
+      &::placeholder { color: rgba(255, 255, 255, 0.3); }
+      &:focus { border-color: rgba(255, 255, 255, 0.55); }
     }
   }
 }
 
-.scanner-body .btn {
-  position: relative;
-  z-index: 1;
-}
-
-.scanner-body .btn-ghost {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.85);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.5);
-    color: #fff;
-  }
-}
-
-// Utility used by scanner controller
-.hidden {
+.u-hidden {
   display: none !important;
 }

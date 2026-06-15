@@ -4,101 +4,86 @@
 // Masthead — hero header with animated vinyl disc and collection stats
 // ==========================================================================
 
+@keyframes disc-spin {
+  to { transform: rotate(360deg); }
+}
+
 .masthead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 54px 28px 22px;
+  @include flex(row, baseline, space-between, $spacing-lg);
+  padding: 54px $spacing-xl 22px;
 
   @include respond-to("mobile") {
-    padding: 36px 16px 16px;
+    padding: $spacing-xxl $spacing-md $spacing-md;
     align-items: center;
   }
-}
 
-.masthead-title {
-  display: flex;
-  align-items: baseline;
-  font-size: clamp(42px, 11vw, 148px);
-  font-weight: 800;
-  letter-spacing: -0.055em;
-  line-height: 0.88;
-  user-select: none;
-}
-
-// Spinning vinyl disc embedded in the wordmark
-.masthead-disc {
-  position: relative;
-  align-self: center;
-  width: 0.4em;
-  height: 0.4em;
-  margin-left: 0.07em;
-  margin-top: 0.22em;
-  border-radius: 50%;
-  flex: none;
-  background: repeating-radial-gradient(circle, #161513 0 1.5px, #2f2d29 1.5px 3.5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: disc-spin 4.5s linear infinite;
-
-  @include reduced-motion {
-    animation: none;
+  &__title {
+    @include flex(row, baseline, flex-start);
+    font-size: clamp(42px, 11vw, 148px);
+    font-weight: $font-weight-extrabold;
+    letter-spacing: -0.055em;
+    line-height: 0.88;
+    user-select: none;
   }
-}
 
-.masthead-disc-label {
-  position: relative;
-  width: 38%;
-  height: 38%;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  &__disc {
+    position: relative;
+    align-self: center;
+    width: 0.4em;
+    height: 0.4em;
+    margin-left: 0.07em;
+    margin-top: 0.22em;
+    border-radius: $border-radius-circle;
+    flex: none;
+    background: repeating-radial-gradient(circle, #161513 0 1.5px, #2f2d29 1.5px 3.5px);
+    @include flex(row, center, center);
+    animation: disc-spin 4.5s linear infinite;
 
-.masthead-disc-hole {
-  width: 11%;
-  height: 11%;
-  min-width: 3px;
-  min-height: 3px;
-  border-radius: 50%;
-  background: var(--bg);
-}
-
-.masthead-disc-notch {
-  position: absolute;
-  top: 14%;
-  left: 50%;
-  width: 14%;
-  height: 14%;
-  min-width: 3px;
-  min-height: 3px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  transform: translateX(-50%);
-}
-
-.masthead-meta {
-  text-align: right;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--muted);
-  font-weight: 500;
-  flex: none;
-  white-space: nowrap;
-
-  strong {
-    color: var(--ink);
-    font-weight: 800;
+    @include reduced-motion {
+      animation: none;
+    }
   }
-}
 
-.masthead-controls {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 6px;
+  &__disc-label {
+    position: relative;
+    width: 38%;
+    height: 38%;
+    border-radius: $border-radius-circle;
+    @include flex(row, center, center);
+  }
+
+  &__disc-hole {
+    width: 11%;
+    height: 11%;
+    min-width: 3px;
+    min-height: 3px;
+    border-radius: $border-radius-circle;
+    background: var(--bg);
+  }
+
+  &__disc-notch {
+    position: absolute;
+    top: 14%;
+    left: 50%;
+    width: 14%;
+    height: 14%;
+    min-width: 3px;
+    min-height: 3px;
+    border-radius: $border-radius-circle;
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateX(-50%);
+  }
+
+  &__meta {
+    @include flex(row, center, flex-end, $spacing-xs);
+    margin-top: 6px;
+    font-size: $font-size-md;
+    color: var(--muted);
+    font-weight: $font-weight-medium;
+
+    strong {
+      color: var(--ink);
+      font-weight: $font-weight-extrabold;
+    }
+  }
 }

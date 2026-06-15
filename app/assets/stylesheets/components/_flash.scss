@@ -1,19 +1,21 @@
+@use "../abstracts/mixins" as *;
+
 // ==========================================================================
 // Flash messages — inline notice and alert banners
 // ==========================================================================
 
 .flash {
-  padding: 12px 28px;
-  font-size: 13px;
-  font-weight: 600;
-}
+  padding: $spacing-sm $spacing-xl;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
 
-.flash-notice {
-  background: #d4edda;
-  color: #155724;
-}
+  &--notice {
+    background: #d4edda;
+    color: #155724;
+  }
 
-.flash-alert {
-  background: #f8d7da;
-  color: #721c24;
+  &--alert {
+    background: #f8d7da;
+    color: #721c24;
+  }
 }

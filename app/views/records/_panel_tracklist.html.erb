@@ -9,7 +9,7 @@
 <% all_tracks = tl&.sort&.flat_map(&:last) || [] %>
 <% if all_tracks.any? %>
   <div class="tracklist">
-    <div class="side-label">Tracklist</div>
+    <div class="tracklist__side-label">Tracklist</div>
     <ol>
       <% all_tracks.each do |track| %>
         <li><%= track %></li>

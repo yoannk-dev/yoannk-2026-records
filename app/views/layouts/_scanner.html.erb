@@ -1,0 +1,84 @@
+<button class="btn btn--primary btn--fab"
+        data-action="scanner#open"
+        aria-label="Ajouter un disque">
+  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+    <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<div class="scanner"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true"
+     aria-labelledby="scanner-title"
+     data-scanner-target="overlay">
+  <div class="scanner__header">
+    <h2 id="scanner-title" class="u-visually-hidden">Ajouter un disque</h2>
+
+    <div class="scanner__mode-tabs" role="tablist" aria-label="Mode de recherche">
+      <button class="scanner__mode-tab is-active"
+              role="tab"
+              aria-selected="true"
+              data-scanner-target="barcodeTab"
+              data-action="scanner#switchMode"
+              data-mode="barcode">Code-barres</button>
+      <button class="scanner__mode-tab"
+              role="tab"
+              aria-selected="false"
+              data-scanner-target="catnoTab"
+              data-action="scanner#switchMode"
+              data-mode="catno">Référence catalogue</button>
+    </div>
+
+    <button class="icon-btn scanner__close-btn"
+            data-action="scanner#close"
+            aria-label="Fermer le scanner">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+        <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="scanner__body">
+    <div class="scanner__viewfinder">
+      <video class="scanner__video"
+             data-scanner-target="video"
+             autoplay
+             playsinline
+             muted
+             aria-hidden="true"></video>
+      <div class="scanner__reticle" aria-hidden="true"></div>
+    </div>
+
+    <p class="scanner__status"
+       data-scanner-target="status"
+       aria-live="polite"
+       aria-atomic="true"></p>
+
+    <button class="btn btn--ghost scanner-manual-toggle u-hidden"
+            data-scanner-target="manualBtn"
+            data-action="scanner#showManual">
+      Ajout manuel
+    </button>
+
+    <form class="scanner__manual u-hidden"
+          data-scanner-target="manualForm"
+          data-action="submit->scanner#submitManual">
+      <div class="form-field">
+        <label for="scanner-manual-input">Référence</label>
+        <input id="scanner-manual-input"
+               type="text"
+               inputmode="numeric"
+               placeholder="ex : 0602435688435"
+               data-scanner-target="manualInput">
+      </div>
+      <button type="submit" class="btn btn--primary">Rechercher</button>
+    </form>
+
+    <button class="btn btn--ghost u-hidden"
+            data-scanner-target="retryBtn"
+            data-action="scanner#retry">
+      Réessayer
+    </button>
+  </div>
+</div>

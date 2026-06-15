@@ -7,7 +7,7 @@
   </main>
 
   <% if @records.empty? %>
-    <div class="empty">
+    <div class="grid__empty">
       <%= @genre.present? ? "Nothing in #{@genre} yet." : "No records in the collection yet." %>
     </div>
   <% end %>

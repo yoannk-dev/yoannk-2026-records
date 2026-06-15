@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" data-controller="theme">
+<html lang="fr" data-theme="light" data-controller="theme">
   <head>
-    <title>Vinyles — Collection</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for?(:title) ? yield(:title) : "Vinyles — Collection" %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -15,78 +15,14 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="panel<%= user_signed_in? ? ' scanner' : '' %>"
-        <% if user_signed_in? %>data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>"
-        data-scanner-tracklist-url-value="<%= records_discogs_tracklist_path %>"<% end %>>
+  <body data-controller="panel<%= ' scanner' if user_signed_in? %>"
+        <% if user_signed_in? %>
+          data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>"
+          data-scanner-tracklist-url-value="<%= records_discogs_tracklist_path %>"
+        <% end %>>
     <%= render "layouts/flash" %>
     <%= yield %>
     <%= render "layouts/panel" %>
-    <% if user_signed_in? %>
-      <button class="btn btn-primary btn-fab" data-action="scanner#open" aria-label="Add new record">
-        <svg width="14" height="14" viewBox="0 0 14 14">
-          <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <div class="scanner-overlay" data-scanner-target="overlay">
-        <div class="scanner-header">
-          <div class="scanner-mode-tabs">
-            <button class="scanner-mode-tab active"
-                    data-scanner-target="barcodeTab"
-                    data-action="scanner#switchMode"
-                    data-mode="barcode">Barcode</button>
-            <button class="scanner-mode-tab"
-                    data-scanner-target="catnoTab"
-                    data-action="scanner#switchMode"
-                    data-mode="catno">Catalog #</button>
-          </div>
-          <button class="icon-btn scanner-close-btn"
-                  data-action="scanner#close"
-                  aria-label="Close scanner">
-            <svg width="14" height="14" viewBox="0 0 14 14">
-              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        <div class="scanner-body">
-          <div class="scanner-viewfinder">
-            <video class="scanner-video"
-                   data-scanner-target="video"
-                   autoplay
-                   playsinline
-                   muted></video>
-            <div class="scanner-reticle"></div>
-          </div>
-
-          <p class="scanner-status" data-scanner-target="status"></p>
-
-          <button class="btn btn-ghost scanner-manual-toggle hidden"
-                  data-scanner-target="manualBtn"
-                  data-action="scanner#showManual">
-            Ajout manuel
-          </button>
-
-          <form class="scanner-manual hidden"
-                data-scanner-target="manualForm"
-                data-action="submit->scanner#submitManual">
-            <div class="form-field">
-              <label for="scanner-manual-input">Référence</label>
-              <input id="scanner-manual-input"
-                     type="text"
-                     inputmode="numeric"
-                     placeholder="ex : 0602435688435"
-                     data-scanner-target="manualInput">
-            </div>
-            <button type="submit" class="btn btn-primary">Rechercher</button>
-          </form>
-
-          <button class="btn btn-ghost hidden"
-                  data-scanner-target="retryBtn"
-                  data-action="scanner#retry">
-            Retry
-          </button>
-        </div>
-      </div>
-    <% end %>
+    <%= render "layouts/scanner" if user_signed_in? %>
   </body>
 </html>

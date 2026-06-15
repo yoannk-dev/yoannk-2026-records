@@ -1,14 +1,14 @@
 <%# locals: (record:) %>
-<div class="panel-cover-wrap">
-  <div class="panel-disc" data-controller="panel-disc">
-    <div class="vinyl-disc"
+<div class="panel__cover-wrap">
+  <div class="panel__disc" data-controller="panel-disc">
+    <div class="vinyl"
          style="width:236px;height:236px;background:repeating-radial-gradient(circle,#181818 0 2px,#232323 2px 4px)">
-      <div class="vinyl-label" style="background:#1a1a1a">
-        <div class="vinyl-hole"></div>
+      <div class="vinyl__label" style="background:#1a1a1a">
+        <div class="vinyl__hole"></div>
       </div>
     </div>
   </div>
-  <div class="panel-cover">
+  <div class="panel__cover">
     <%= render "sleeve", record: record, radius: 2 %>
   </div>
 </div>

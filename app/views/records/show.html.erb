@@ -1,7 +1,7 @@
 <turbo-frame id="panel_content">
-  <div class="panel-inner">
-    <div class="panel-top">
-      <div class="panel-kicker"><%= [@record.genre, @record.year].compact.join(" · ") %></div>
+  <div class="panel__inner">
+    <div class="panel__top">
+      <div class="panel__kicker"><%= [@record.genre, @record.year].compact.join(" · ") %></div>
       <button class="icon-btn"
               data-action="panel#close"
               aria-label="Close panel">
@@ -13,19 +13,19 @@
 
     <%= render "panel_cover", record: @record %>
 
-    <div class="panel-heading">
-      <div class="panel-artist"><%= @record.artist %></div>
-      <h2 class="panel-title"><%= @record.title %></h2>
+    <div class="panel__heading">
+      <div class="panel__artist"><%= @record.artist %></div>
+      <h2 class="panel__title"><%= @record.title %></h2>
     </div>
 
     <%= render "panel_meta", record: @record, user_record: @user_record %>
 
     <%= render "panel_tracklist", record: @record %>
 
-    <div class="panel-actions">
+    <div class="panel__actions">
       <% if @record.discogs_id.present? %>
         <%= link_to "https://www.discogs.com/release/#{@record.discogs_id}",
-              class: "btn btn-ghost",
+              class: "btn btn--ghost",
               target: "_blank",
               rel: "noopener noreferrer" do %>
           View on Discogs
@@ -40,7 +40,7 @@
     </div>
 
     <% if @user_record&.added_at %>
-      <div class="panel-added">Added <%= @user_record.added_at.strftime("%-d %b %Y") %></div>
+      <div class="panel__added">Added <%= @user_record.added_at.strftime("%-d %b %Y") %></div>
     <% end %>
   </div>
 </turbo-frame>
