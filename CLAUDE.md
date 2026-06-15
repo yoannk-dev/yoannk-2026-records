@@ -7,7 +7,7 @@ Single-owner vinyl collection app. Public can browse, only the owner can add rec
 ```bash
 bin/setup          # Install deps, create and migrate the database
 bin/dev            # Start dev server (Puma + dartsass watcher)
-bin/ci             # Lint + security audit (no test suite yet)
+bin/ci             # Lint + security audit
 
 bin/rubocop -a                    # Lint + auto-correct (rails-omakase style)
 bin/brakeman --quiet --no-pager   # Static security analysis
@@ -16,9 +16,15 @@ bin/bundler-audit                 # CVE audit
 bin/rails dartsass:build          # One-off SCSS compile → app/assets/builds/application.css
 bin/rails db:migrate
 bin/rails console
+
+bin/test                          # Run full RSpec suite
+bundle exec rspec spec/models/    # Model specs only
+bundle exec rspec spec/requests/  # Request specs only
+bundle exec rspec spec/system/    # System specs only (headless Chrome)
+bundle exec rspec --seed 42       # Run with specific seed
 ```
 
-No test suite (`rails/test_unit/railtie` is commented out in `config/application.rb`).
+`rails/test_unit/railtie` is commented out in `config/application.rb` — RSpec is the test framework.
 
 ## Stack
 
@@ -32,6 +38,40 @@ No test suite (`rails/test_unit/railtie` is commented out in `config/application
 - `solid_cable` — Action Cable
 
 All three share the primary database; tables are in standard migrations / `db/schema.rb`.
+
+## Testing
+
+**Stack:** RSpec-Rails · FactoryBot · Faker · Capybara + headless Chrome (Selenium) · DatabaseCleaner · WebMock · shoulda-matchers
+
+**61 specs across 3 layers:**
+
+| Layer | Location | Strategy | Auth helper |
+|-------|----------|----------|-------------|
+| Model | `spec/models/` | transaction | — |
+| Request | `spec/requests/` | transaction | `Devise::Test::IntegrationHelpers` (`sign_in`) |
+| System | `spec/system/` | truncation | `Warden::Test::Helpers` (`login_as`, `logout`) |
+
+**Support files** (`spec/support/`):
+- `database_cleaner.rb` — transaction for model/request, truncation for system; pre-flight `clean_with(:truncation)` before each system example to clear any residual state
+- `capybara.rb` — registers `:headless_chrome` driver; non-JS system specs use `:rack_test`
+- `devise.rb` — includes the right auth helper per spec type; calls `Warden.test_reset!` after each system example
+- `shoulda_matchers.rb` — integrates with RSpec + Rails
+
+**Key gotchas:**
+- `DatabaseCleaner[:active_record]` namespace triggers `NameError` — use `DatabaseCleaner.strategy =` (no namespace) with `require "database_cleaner/active_record"` at top of support file
+- System specs use truncation (not transactions) so data committed by one connection is visible to the Puma test server on a different connection
+- `User.first` is the owner — request specs must `create(:user)` first so the owner exists before the request
+- `login_as(owner, scope: :user)` for system specs; `sign_in owner` for request specs
+- After `click_button` with a Turbo form, wait for a DOM change before querying the DB — `click_button` returns before the Turbo fetch completes
+- Faker-generated names can contain apostrophes → `CGI.escapeHTML(str)` when asserting `response.body.include?`
+- CSS `text-transform: uppercase` on `.panel__artist` and `.cell__caption-artist` — Selenium's `innerText` is uppercased; compare with `.downcase`
+- `execute_script("document.querySelectorAll('[required]').forEach(el => el.removeAttribute('required'))")` to bypass HTML5 client-side validation in system specs
+- `new.html.erb` and the panel aside both render `<turbo-frame id="panel_content">` when visiting `new_record_path` directly — two frames with the same ID; Turbo stream `replace` targets whichever comes first in the DOM
+
+**DB setup for test env:**
+```bash
+RAILS_ENV=test bundle exec rails db:create db:schema:load
+```
 
 ## Environment variables
 
