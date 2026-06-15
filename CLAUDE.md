@@ -95,17 +95,49 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `app/views/layouts/application.html.erb` | Root layout — `data-controller="panel"` on `<body>` |
 | `app/views/layouts/_panel.html.erb` | Scrim overlay + panel aside |
 | `app/assets/stylesheets/application.scss` | SCSS entry point (imports only) |
-| `app/assets/stylesheets/abstracts/` | `_variables.scss` (tokens) · `_mixins.scss` (respond-to, reduced-motion) |
+| `app/assets/stylesheets/abstracts/` | `_variables.scss` (SCSS tokens + CSS custom properties) · `_mixins.scss` (flex, truncate, label-uppercase, respond-to, reduced-motion) |
 | `app/assets/stylesheets/components/` | One file per UI block |
+
+## SCSS architecture
+
+**Convention:** strict BEM — `__` for elements, `--` for modifiers, `is-` prefix for JS-toggled states, `u-` prefix for utilities.
+
+**Abstracts** (`app/assets/stylesheets/abstracts/`):
+- `_variables.scss` — SCSS `$` tokens (spacing, font sizes/weights, border-radius, durations, breakpoints) + CSS custom properties (`:root[data-theme]` blocks for runtime theming).
+- `_mixins.scss` — forwards `_variables.scss` (so components only need one `@use "../abstracts/mixins" as *`), then defines: `flex()`, `truncate()`, `label-uppercase()`, `respond-to()`, `reduced-motion`.
+
+**Key token values:**
+
+| Token | Value | Token | Value |
+|-------|-------|-------|-------|
+| `$spacing-xs` | 8px | `$font-size-md` | 13px |
+| `$spacing-md` | 16px | `$font-size-lg` | 14px |
+| `$spacing-lg` | 24px | `$font-weight-bold` | 700 |
+| `$spacing-xl` | 28px (standard side padding) | `$font-weight-extrabold` | 800 |
+| `$spacing-xxl` | 36px | `$border-radius-md` | 8px |
+| `$duration-fast` | 0.15s | `$border-radius-pill` | 999px |
+| `$bp-mobile` | 720px | `$border-radius-circle` | 50% |
+
+**JS-toggled classes** — controllers must use these exact names:
+
+| Class | Added by |
+|-------|---------|
+| `.panel--open` | `panel` controller |
+| `.scrim--open` | `panel` controller |
+| `.panel__disc--out` | `panel-disc` controller (50 ms after connect) |
+| `.chip--active` | `filter` controller |
+| `.scanner--open` | `scanner` controller |
+| `.is-active` | `scanner` controller (mode tabs) |
+| `.u-hidden` | `scanner` controller (show/hide elements) |
 
 ## Stimulus controllers
 
 | Controller | Responsibility |
 |-----------|---------------|
 | `panel` | Slide-in detail panel on `<body>`. Opens on record click, closes on Escape / scrim / close button. Pushes URL, restores genre filter on close. |
-| `panel-disc` | Adds `panel-disc-out` class 50 ms after connect to trigger CSS slide animation. Lives inside the panel turbo-frame. |
+| `panel-disc` | Adds `panel__disc--out` class 50 ms after connect to trigger CSS slide animation. Lives inside the panel turbo-frame. |
 | `scanner` | Camera overlay with two modes — `barcode` (native `BarcodeDetector` + polyfill, requires 3 consecutive identical reads) and `catno` (manual entry). Calls `discogs_lookup` then `discogs_tracklist`, then loads `new.html.erb` into `panel_content`. Falls back to manual input on camera denial or unsupported browser. |
 | `add-prompt` | Shows login-link tooltip for guests; triggers `scanner#open` when logged in. |
 | `theme` | Toggles `data-theme` on `<html>`, persists to `localStorage`. |
-| `filter` | Syncs `chip-active` class with current `?genre=` param on connect. |
+| `filter` | Syncs `chip--active` class with current `?genre=` param on connect. |
 | `infinite-scroll` | IntersectionObserver sentinel — fetches next page and appends `.cell` elements to `#records-grid`. |
