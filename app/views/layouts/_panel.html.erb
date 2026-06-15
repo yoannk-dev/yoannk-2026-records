@@ -1,7 +1,15 @@
-<div id="scrim" class="scrim<%= ' scrim--open' if @open_record %>"
+<div id="scrim"
+     class="scrim<%= ' scrim--open' if @open_record %>"
      data-panel-target="scrim"
-     data-action="click->panel#close"></div>
+     data-action="click->panel#close"
+     aria-hidden="true"></div>
 
-<aside id="panel" class="panel<%= ' panel--open' if @open_record %>" data-panel-target="panel">
+<aside id="panel"
+       class="panel<%= ' panel--open' if @open_record %>"
+       role="dialog"
+       aria-modal="true"
+       aria-hidden="<%= @open_record ? 'false' : 'true' %>"
+       aria-label="Détail du disque"
+       data-panel-target="panel">
   <turbo-frame id="panel_content"<% if @open_record %> src="<%= record_path(@open_record) %>"<% end %>></turbo-frame>
 </aside>

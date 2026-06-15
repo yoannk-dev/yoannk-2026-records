@@ -94,6 +94,7 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `app/views/records/new.html.erb` | Add-record form (Discogs pre-filled) inside same turbo-frame |
 | `app/views/layouts/application.html.erb` | Root layout — `data-controller="panel"` on `<body>` |
 | `app/views/layouts/_panel.html.erb` | Scrim overlay + panel aside |
+| `app/views/layouts/_scanner.html.erb` | FAB button + camera overlay (owner only) |
 | `app/javascript/helpers/fetch_json.js` | Shared JSON fetch wrapper — sets Accept header, throws on HTTP errors with `.status` attached, supports `AbortController` via `signal` option |
 | `app/assets/stylesheets/application.scss` | SCSS entry point (imports only) |
 | `app/assets/stylesheets/abstracts/` | `_variables.scss` (SCSS tokens + CSS custom properties) · `_mixins.scss` (flex, truncate, label-uppercase, respond-to, reduced-motion) |
@@ -122,10 +123,9 @@ pin_all_from "app/javascript/helpers", under: "helpers"
 - `initialize()` for one-time setup (runs once per controller instance even across Turbo reconnections); `connect()` for setup that must repeat on each reconnect
 - All controllers use `AbortController` for in-flight fetch cancellation in `disconnect()`
 
-**ARIA — pending HTML work** (controllers manage state, HTML must set the initial attributes):
-- Panel aside (`_panel.html.erb`): needs `aria-hidden="true"` initial, `role="dialog"`, `aria-modal="true"`
-- Scanner overlay: same — `aria-hidden="true"` initial, `role="dialog"`, `aria-modal="true"`
-- Scanner status element: needs `aria-live="polite" aria-atomic="true"` in HTML
+**ARIA — pending JS controller work** (HTML attributes are set; controllers must now sync them):
+- `panel` controller: toggle `aria-hidden` on `<aside#panel>` alongside `panel--open`
+- `scanner` controller: toggle `aria-hidden` on `.scanner[role="dialog"]` alongside `scanner--open`; manage `aria-selected` on mode tabs alongside `is-active`; implement focus trap (focus first interactive element on open, return focus to FAB on close)
 
 ## SCSS architecture
 
@@ -158,6 +158,12 @@ pin_all_from "app/javascript/helpers", under: "helpers"
 | `.scanner--open` | `scanner` controller |
 | `.is-active` | `scanner` controller (mode tabs) |
 | `.u-hidden` | `scanner` controller (show/hide elements) |
+
+**Utility classes** — defined in SCSS, not toggled by JS:
+
+| Class | Purpose |
+|-------|---------|
+| `.u-visually-hidden` | Visually hidden but accessible to screen readers (used for dialog titles) |
 
 ## Stimulus controllers
 
