@@ -1,6 +1,6 @@
 <div class="cell" id="record_<%= record.id %>">
   <%= link_to record_path(record),
-        class: "cell-btn",
+        class: "cell__btn",
         data: {
           turbo_frame: "panel_content",
           action: "panel#open"
@@ -8,8 +8,8 @@
         aria: { label: "#{record.artist} — #{record.title}" } do %>
     <%= render "sleeve", record: record %>
   <% end %>
-  <div class="cell-caption">
-    <div class="cell-caption-artist"><%= record.artist %></div>
-    <div class="cell-caption-title"><%= record.title %></div>
+  <div class="cell__caption">
+    <div class="cell__caption-artist"><%= record.artist %></div>
+    <div class="cell__caption-title"><%= record.title %></div>
   </div>
 </div>

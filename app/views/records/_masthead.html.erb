@@ -1,25 +1,23 @@
 <header class="masthead">
-  <h1 class="masthead-title">
+  <h1 class="masthead__title">
     Vinyles
-    <span class="masthead-disc" aria-hidden="true">
-      <span class="masthead-disc-label" style="background: var(--accent)">
-        <span class="masthead-disc-notch"></span>
-        <span class="masthead-disc-hole"></span>
+    <span class="masthead__disc" aria-hidden="true">
+      <span class="masthead__disc-label" style="background: var(--accent)">
+        <span class="masthead__disc-notch"></span>
+        <span class="masthead__disc-hole"></span>
       </span>
     </span>
   </h1>
-  <div class="masthead-meta">
-    <div class="masthead-controls">
-      <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
-      <button class="icon-btn"
-              data-action="theme#toggle"
-              aria-label="Toggle theme"
-              title="Toggle theme">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-          <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
-                stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
+  <div class="masthead__meta">
+    <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
+    <button class="icon-btn"
+            data-action="theme#toggle"
+            aria-label="Toggle theme"
+            title="Toggle theme">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+        <path d="M13.8 9.6A6 6 0 1 1 6.4 2.2a4.8 4.8 0 0 0 7.4 7.4Z"
+              stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
 </header>

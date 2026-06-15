@@ -1,60 +1,56 @@
+@use "../abstracts/mixins" as *;
+
 // ==========================================================================
 // Forms — login page layout and form field styles
 // ==========================================================================
 
-.login-wrap {
+.login {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex(row, center, center);
   background: var(--bg);
-  padding: 24px;
-}
+  padding: $spacing-lg;
 
-.login-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 36px 32px;
-  width: 100%;
-  max-width: 360px;
-}
+  &__card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: $border-radius-lg;
+    padding: $spacing-xxl 32px;
+    width: 100%;
+    max-width: 360px;
+  }
 
-.login-logo {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 28px;
-  color: var(--ink);
+  &__logo {
+    font-size: 22px;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: -0.03em;
+    margin-bottom: $spacing-xl;
+    color: var(--ink);
 
-  span {
-    color: var(--accent);
+    span { color: var(--accent); }
+  }
+
+  &__error {
+    font-size: $font-size-md;
+    color: #c0392b;
+    margin-bottom: $spacing-md;
+    font-weight: $font-weight-medium;
+  }
+
+  &__submit {
+    width: 100%;
+    margin-top: $spacing-xs;
+    height: 42px;
+    font-size: $font-size-lg;
   }
 }
 
-.login-error {
-  font-size: 13px;
-  color: #c0392b;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.login-submit {
-  width: 100%;
-  margin-top: 8px;
-  height: 42px;
-  font-size: 14px;
-}
-
 .form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  @include flex(column, stretch, flex-start, 6px);
+  margin-bottom: $spacing-md;
 
   label {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--muted);
@@ -63,50 +59,46 @@
   input,
   select {
     height: 40px;
-    padding: 0 12px;
+    padding: 0 $spacing-sm;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: $border-radius-md;
     background: var(--bg);
     color: var(--ink);
     font: inherit;
-    font-size: 14px;
+    font-size: $font-size-lg;
     outline: none;
-    transition: border-color 0.15s;
+    transition: border-color $duration-fast;
     appearance: none;
     width: 100%;
 
-    &:focus {
-      border-color: var(--ink);
-    }
+    &:focus { border-color: var(--ink); }
   }
 }
 
-.form-row {
+.form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 16px;
+  gap: 0 $spacing-md;
 }
 
-.form-errors {
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 8px;
+.form__errors {
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm;
+  border-radius: $border-radius-md;
   background: rgba(192, 57, 43, 0.08);
 }
 
-.form-error-msg {
-  font-size: 13px;
+.form__error-msg {
+  font-size: $font-size-md;
   color: #c0392b;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   line-height: 1.4;
 
-  & + & {
-    margin-top: 4px;
-  }
+  & + & { margin-top: $spacing-xxs; }
 }
 
-.form-actions {
-  margin-top: 8px;
-  padding-top: 16px;
+.form__actions {
+  margin-top: $spacing-xs;
+  padding-top: $spacing-md;
   border-top: 1px solid var(--line);
 }

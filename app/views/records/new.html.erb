@@ -1,7 +1,7 @@
 <turbo-frame id="panel_content">
-  <div class="panel-inner">
-    <div class="panel-top">
-      <div class="panel-kicker">New Record</div>
+  <div class="panel__inner">
+    <div class="panel__top">
+      <div class="panel__kicker">New Record</div>
       <button class="icon-btn"
               data-action="panel#close"
               aria-label="Close panel">
@@ -12,9 +12,9 @@
     </div>
 
     <% if @record.errors.any? %>
-      <div class="form-errors">
+      <div class="form__errors">
         <% @record.errors.full_messages.each do |msg| %>
-          <p class="form-error-msg"><%= msg %></p>
+          <p class="form__error-msg"><%= msg %></p>
         <% end %>
       </div>
     <% end %>
@@ -42,7 +42,7 @@
               autocomplete: "off" %>
       </div>
 
-      <div class="form-row">
+      <div class="form__row">
         <div class="form-field">
           <%= f.label :year %>
           <%= f.number_field :year, min: 1900, max: Date.today.year %>
@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form__row">
         <div class="form-field">
           <%= f.label :genre %>
           <%= f.text_field :genre %>
@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form__row">
         <div class="form-field">
           <%= f.label :catalog_number, "Cat. #" %>
           <%= f.text_field :catalog_number, autocomplete: "off" %>
@@ -77,8 +77,8 @@
         </div>
       </div>
 
-      <div class="form-actions">
-        <%= f.submit "Add to Collection", class: "btn btn-primary" %>
+      <div class="form__actions">
+        <%= f.submit "Add to Collection", class: "btn btn--primary" %>
       </div>
     <% end %>
   </div>

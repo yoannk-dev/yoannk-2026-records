@@ -6,19 +6,64 @@
 
 .grid {
   display: grid;
-  padding: 20px 28px 64px;
+  padding: 20px $spacing-xl 64px;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 10px;
 
   @include respond-to("mobile") {
-    padding: 14px 16px 56px;
+    padding: 14px $spacing-md 56px;
     grid-template-columns: repeat(2, minmax(145px, 1fr));
+  }
+
+  &__empty {
+    padding: 80px $spacing-xl;
+    text-align: center;
+    color: var(--muted);
+    font-size: $font-size-lg;
   }
 }
 
 .cell {
-  display: flex;
-  flex-direction: column;
+  @include flex(column, stretch, flex-start);
+
+  &__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: var(--cover-radius);
+    }
+
+    &:hover,
+    &:focus-visible {
+      .sleeve { transform: translateY(-6px); }
+    }
+  }
+
+  &__caption {
+    padding: $spacing-xs 2px 0;
+  }
+
+  &__caption-artist {
+    font-size: 10.5px;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  &__caption-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-top: 2px;
+    margin-bottom: 15px;
+    @include truncate;
+  }
 }
 
 .sleeve {
@@ -27,63 +72,10 @@
   aspect-ratio: 1;
   overflow: hidden;
   container-type: inline-size;
-  border-radius: 6px;
-}
-
-.cell-btn {
-  display: block;
-  width: 100%;
-  padding: 0;
-
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: var(--cover-radius);
-  }
-
-  &:hover,
-  &:focus-visible {
-    .sleeve {
-      transform: translateY(-6px);
-    }
-  }
-}
-
-.sleeve {
+  border-radius: $border-radius-sm;
   transition: transform 0.3s ease;
 
   @include reduced-motion {
     transition: none;
   }
-}
-
-.cell-caption {
-  padding: 8px 2px 0;
-}
-
-.cell-caption-artist {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.cell-caption-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin-top: 2px;
-  margin-bottom: 15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.empty {
-  padding: 80px 28px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 14px;
 }

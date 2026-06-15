@@ -15,14 +15,12 @@
   pointer-events: none;
   transition: opacity 0.35s ease;
 
-  @include reduced-motion {
-    transition: none;
-  }
-}
+  @include reduced-motion { transition: none; }
 
-.scrim-open {
-  opacity: 1;
-  pointer-events: auto;
+  &--open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 // --- Panel container ---
@@ -41,157 +39,140 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 
-  @include reduced-motion {
-    transition: none;
+  @include reduced-motion { transition: none; }
+
+  &--open { transform: translateX(0); }
+
+  &__inner {
+    padding: 20px $spacing-xl $spacing-xxl;
+
+    @include respond-to("mobile") {
+      padding: 18px 20px 32px;
+    }
   }
-}
 
-.panel-open {
-  transform: translateX(0);
-}
-
-.panel-inner {
-  padding: 20px 28px 36px;
-
-  @include respond-to("mobile") {
-    padding: 18px 20px 32px;
+  &__top {
+    @include flex(row, center, space-between);
+    margin-bottom: 18px;
   }
-}
 
-.panel-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.panel-kicker {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-// --- Cover + sliding vinyl disc ---
-
-.panel-cover-wrap {
-  position: relative;
-  height: 250px;
-  margin-bottom: 22px;
-}
-
-.panel-cover {
-  position: relative;
-  z-index: 1;
-  width: 250px;
-  height: 250px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
-}
-
-// Disc slides right 0.3 s after panel opens (panel-disc controller adds .panel-disc-out)
-.panel-disc {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  z-index: 0;
-  transform: translateX(0);
-  transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1) 0.3s;
-
-  @include reduced-motion {
-    transition: none;
+  &__kicker {
+    @include label-uppercase;
   }
-}
 
-.panel-disc-out {
-  transform: translateX(128px);
+  // Disc slides right 0.3 s after panel opens (panel-disc controller adds .panel__disc--out)
+  &__disc {
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    z-index: 0;
+    transform: translateX(0);
+    transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1) 0.3s;
 
-  @include respond-to("mobile") {
-    transform: translateX(70px);
+    @include reduced-motion { transition: none; }
+
+    &--out {
+      transform: translateX(128px);
+
+      @include respond-to("mobile") {
+        transform: translateX(70px);
+      }
+    }
+  }
+
+  &__cover-wrap {
+    position: relative;
+    height: 250px;
+    margin-bottom: 22px;
+  }
+
+  &__cover {
+    position: relative;
+    z-index: 1;
+    width: 250px;
+    height: 250px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  }
+
+  &__heading {
+    margin-bottom: 22px;
+  }
+
+  &__artist {
+    @include label-uppercase($font-size-sm);
+    margin-bottom: $spacing-xxs;
+  }
+
+  &__title {
+    font-size: 27px;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    text-wrap: pretty;
+  }
+
+  &__actions {
+    @include flex(row, center, space-between, $spacing-sm);
+  }
+
+  &__added {
+    margin-top: 18px;
+    font-size: $font-size-xs;
+    color: var(--muted);
   }
 }
 
 // --- Vinyl disc anatomy ---
 
-.vinyl-disc {
+.vinyl {
   position: relative;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: $border-radius-circle;
+  @include flex(row, center, center);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
 
-.vinyl-label {
-  width: 35%;
-  height: 35%;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  &__label {
+    width: 35%;
+    height: 35%;
+    border-radius: $border-radius-circle;
+    @include flex(row, center, center);
+  }
 
-.vinyl-hole {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--surface);
-}
-
-// --- Heading ---
-
-.panel-heading {
-  margin-bottom: 22px;
-}
-
-.panel-artist {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.panel-title {
-  font-size: 27px;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
-  text-wrap: pretty;
+  &__hole {
+    width: 7px;
+    height: 7px;
+    border-radius: $border-radius-circle;
+    background: var(--surface);
+  }
 }
 
 // --- Metadata grid ---
 
-.meta-grid {
+.meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 24px;
+  gap: 0 $spacing-lg;
   border-top: 1px solid var(--line);
-  margin-bottom: 24px;
-}
+  margin-bottom: $spacing-lg;
 
-.meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line);
-}
+  &__row {
+    @include flex(row, baseline, space-between, $spacing-sm);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
 
-.meta-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+  &__label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-.meta-value {
-  font-size: 13px;
-  font-weight: 600;
-  text-align: right;
+  &__value {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    text-align: right;
+  }
 }
 
 // --- Tracklist ---
@@ -199,59 +180,34 @@
 .tracklist {
   width: 100%;
   margin-bottom: 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+  @include flex(column, stretch, flex-start, $spacing-xs);
 
-.side-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
+  &__side-label {
+    @include label-uppercase;
+    margin-bottom: $spacing-xs;
+  }
 
-.tracklist ol {
-  list-style: none;
-  counter-reset: track;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+  ol {
+    list-style: none;
+    counter-reset: track;
+    @include flex(column, stretch, flex-start, 6px);
+  }
 
-.tracklist li {
-  counter-increment: track;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.35;
-  display: flex;
-  gap: 8px;
+  li {
+    counter-increment: track;
+    font-size: $font-size-md;
+    font-weight: $font-weight-medium;
+    line-height: 1.35;
+    @include flex(row, flex-start, flex-start, $spacing-xs);
 
-  &::before {
-    content: counter(track);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    min-width: 12px;
-    padding-top: 1px;
+    &::before {
+      content: counter(track);
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: var(--muted);
+      min-width: 12px;
+      padding-top: 1px;
+    }
   }
 }
 
-// --- Barcode ---
-
-// --- Actions and footer ---
-
-.panel-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.panel-added {
-  margin-top: 18px;
-  font-size: 11px;
-  color: var(--muted);
-}

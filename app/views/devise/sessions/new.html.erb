@@ -1,9 +1,9 @@
-<div class="login-wrap">
-  <div class="login-card">
-    <div class="login-logo">Vinyle<span>.</span></div>
+<div class="login">
+  <div class="login__card">
+    <div class="login__logo">Vinyle<span>.</span></div>
 
     <% if alert.present? %>
-      <div class="login-error"><%= alert %></div>
+      <div class="login__error"><%= alert %></div>
     <% end %>
 
     <%= form_for(resource, as: resource_name, url: session_path(resource_name),
@@ -18,7 +18,7 @@
         <%= f.password_field :password, autocomplete: "current-password" %>
       </div>
 
-      <%= f.submit "Sign in", class: "btn btn-primary login-submit" %>
+      <%= f.submit "Sign in", class: "btn btn--primary login__submit" %>
     <% end %>
   </div>
 </div>

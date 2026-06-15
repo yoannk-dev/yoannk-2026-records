@@ -41,12 +41,12 @@ export default class extends Controller {
   }
 
   _show() {
-    this.panelTarget.classList.add("panel-open")
-    this.scrimTarget.classList.add("scrim-open")
+    this.panelTarget.classList.add("panel--open")
+    this.scrimTarget.classList.add("scrim--open")
   }
 
   _hide() {
-    this.panelTarget.classList.remove("panel-open")
-    this.scrimTarget.classList.remove("scrim-open")
+    this.panelTarget.classList.remove("panel--open")
+    this.scrimTarget.classList.remove("scrim--open")
   }
 }

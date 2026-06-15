@@ -22,24 +22,24 @@
     <%= yield %>
     <%= render "layouts/panel" %>
     <% if user_signed_in? %>
-      <button class="btn btn-primary btn-fab" data-action="scanner#open" aria-label="Add new record">
+      <button class="btn btn--primary btn--fab" data-action="scanner#open" aria-label="Add new record">
         <svg width="14" height="14" viewBox="0 0 14 14">
           <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </button>
-      <div class="scanner-overlay" data-scanner-target="overlay">
-        <div class="scanner-header">
-          <div class="scanner-mode-tabs">
-            <button class="scanner-mode-tab active"
+      <div class="scanner" data-scanner-target="overlay">
+        <div class="scanner__header">
+          <div class="scanner__mode-tabs">
+            <button class="scanner__mode-tab is-active"
                     data-scanner-target="barcodeTab"
                     data-action="scanner#switchMode"
                     data-mode="barcode">Barcode</button>
-            <button class="scanner-mode-tab"
+            <button class="scanner__mode-tab"
                     data-scanner-target="catnoTab"
                     data-action="scanner#switchMode"
                     data-mode="catno">Catalog #</button>
           </div>
-          <button class="icon-btn scanner-close-btn"
+          <button class="icon-btn scanner__close-btn"
                   data-action="scanner#close"
                   aria-label="Close scanner">
             <svg width="14" height="14" viewBox="0 0 14 14">
@@ -48,25 +48,25 @@
           </button>
         </div>
 
-        <div class="scanner-body">
-          <div class="scanner-viewfinder">
-            <video class="scanner-video"
+        <div class="scanner__body">
+          <div class="scanner__viewfinder">
+            <video class="scanner__video"
                    data-scanner-target="video"
                    autoplay
                    playsinline
                    muted></video>
-            <div class="scanner-reticle"></div>
+            <div class="scanner__reticle"></div>
           </div>
 
-          <p class="scanner-status" data-scanner-target="status"></p>
+          <p class="scanner__status" data-scanner-target="status"></p>
 
-          <button class="btn btn-ghost scanner-manual-toggle hidden"
+          <button class="btn btn--ghost scanner-manual-toggle u-hidden"
                   data-scanner-target="manualBtn"
                   data-action="scanner#showManual">
             Ajout manuel
           </button>
 
-          <form class="scanner-manual hidden"
+          <form class="scanner__manual u-hidden"
                 data-scanner-target="manualForm"
                 data-action="submit->scanner#submitManual">
             <div class="form-field">
@@ -77,10 +77,10 @@
                      placeholder="ex : 0602435688435"
                      data-scanner-target="manualInput">
             </div>
-            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <button type="submit" class="btn btn--primary">Rechercher</button>
           </form>
 
-          <button class="btn btn-ghost hidden"
+          <button class="btn btn--ghost u-hidden"
                   data-scanner-target="retryBtn"
                   data-action="scanner#retry">
             Retry

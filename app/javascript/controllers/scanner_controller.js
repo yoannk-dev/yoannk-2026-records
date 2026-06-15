@@ -21,9 +21,9 @@ export default class extends Controller {
   async open() {
     this._mode = "barcode"
     this._setModeActive("barcode")
-    this.manualFormTarget.classList.add("hidden")
-    this.manualBtnTarget.classList.add("hidden")
-    this.retryBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.add("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
+    this.retryBtnTarget.classList.add("u-hidden")
     this._setStatus("")
     this._showOverlay()
     await this._startCamera()
@@ -40,10 +40,10 @@ export default class extends Controller {
     this._mode = mode
     this._setModeActive(mode)
     this._stopCamera()
-    this.retryBtnTarget.classList.add("hidden")
+    this.retryBtnTarget.classList.add("u-hidden")
     this._retryValue = null
-    this.manualFormTarget.classList.add("hidden")
-    this.manualBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.add("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
     this._setStatus("")
     await this._startCamera()
   }
@@ -55,8 +55,8 @@ export default class extends Controller {
     this.manualInputTarget.placeholder = isBarcode ? "ex : 0602435688435" : "ex : BLP 1568, ECM 1064"
     this.manualInputTarget.value = ""
     this._setStatus(isBarcode ? "Entrez le code-barres manuellement :" : "Entrez le numéro de catalogue inscrit sur l'étiquette :")
-    this.manualFormTarget.classList.remove("hidden")
-    this.manualBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.remove("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
     this.manualInputTarget.focus()
   }
 
@@ -67,7 +67,7 @@ export default class extends Controller {
   }
 
   async retry() {
-    this.retryBtnTarget.classList.add("hidden")
+    this.retryBtnTarget.classList.add("u-hidden")
     if (this._retryValue) await this._lookup(this._retryValue)
   }
 
@@ -100,7 +100,7 @@ export default class extends Controller {
         this._setStatus("Pointez la caméra vers l'étiquette du disque")
       }
 
-      this.manualBtnTarget.classList.remove("hidden")
+      this.manualBtnTarget.classList.remove("u-hidden")
     } catch {
       const isBarcode = this._mode === "barcode"
       this._showManual(
@@ -146,8 +146,8 @@ export default class extends Controller {
 
   async _lookup(value) {
     this._setStatus("Recherche sur Discogs…")
-    this.manualFormTarget.classList.add("hidden")
-    this.manualBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.add("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
 
     const param = this._mode === "catno" ? "catno" : "barcode"
 
@@ -188,12 +188,12 @@ export default class extends Controller {
       } else {
         this._setStatus("Erreur lors de la recherche Discogs.")
         this._retryValue = value
-        this.retryBtnTarget.classList.remove("hidden")
+        this.retryBtnTarget.classList.remove("u-hidden")
       }
     } catch {
       this._setStatus("Erreur réseau. Vérifiez votre connexion.")
       this._retryValue = value
-      this.retryBtnTarget.classList.remove("hidden")
+      this.retryBtnTarget.classList.remove("u-hidden")
     }
   }
 
@@ -211,8 +211,8 @@ export default class extends Controller {
     this.manualInputTarget.value = value
     this.manualInputTarget.inputMode = inputMode
     this.manualInputTarget.placeholder = placeholder
-    this.manualFormTarget.classList.remove("hidden")
-    this.manualBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.remove("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
     this.manualInputTarget.focus()
   }
 
@@ -228,21 +228,21 @@ export default class extends Controller {
   }
 
   _setModeActive(mode) {
-    this.barcodeTabTarget.classList.toggle("active", mode === "barcode")
-    this.catnoTabTarget.classList.toggle("active", mode === "catno")
+    this.barcodeTabTarget.classList.toggle("is-active", mode === "barcode")
+    this.catnoTabTarget.classList.toggle("is-active", mode === "catno")
   }
 
   _showOverlay() {
-    this.overlayTarget.classList.add("scanner-open")
+    this.overlayTarget.classList.add("scanner--open")
     document.body.classList.add("scanner-active")
   }
 
   _hideOverlay() {
-    this.overlayTarget.classList.remove("scanner-open")
+    this.overlayTarget.classList.remove("scanner--open")
     document.body.classList.remove("scanner-active")
-    this.manualFormTarget.classList.add("hidden")
-    this.manualBtnTarget.classList.add("hidden")
-    this.retryBtnTarget.classList.add("hidden")
+    this.manualFormTarget.classList.add("u-hidden")
+    this.manualBtnTarget.classList.add("u-hidden")
+    this.retryBtnTarget.classList.add("u-hidden")
     this._setStatus("")
     this._retryValue = null
   }

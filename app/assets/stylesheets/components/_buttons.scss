@@ -1,16 +1,16 @@
+@use "../abstracts/mixins" as *;
+
 // ==========================================================================
 // Buttons — icon button, primary, ghost, and danger variants
 // ==========================================================================
 
 .icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include flex(row, center, center);
   width: 34px;
   height: 34px;
-  border-radius: 50%;
+  border-radius: $border-radius-circle;
   color: var(--muted);
-  transition: color 0.15s, background 0.15s;
+  transition: color $duration-fast, background $duration-fast;
 
   &:hover {
     color: var(--ink);
@@ -19,38 +19,30 @@
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 9px 16px;
-  border-radius: 999px;
-  transition: opacity 0.15s, background 0.15s;
-}
+  @include flex(row, center, center);
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  padding: 9px $spacing-md;
+  border-radius: $border-radius-pill;
+  transition: opacity $duration-fast, background $duration-fast;
 
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
+  &--primary {
+    background: var(--accent);
+    color: #fff;
 
-  &:hover {
-    opacity: 0.88;
+    &:hover { opacity: 0.88; }
   }
-}
 
-.btn-ghost {
-  border: 1px solid var(--line);
-  color: var(--ink);
+  &--ghost {
+    border: 1px solid var(--line);
+    color: var(--ink);
 
-  &:hover {
-    background: var(--line);
+    &:hover { background: var(--line); }
   }
-}
 
-.btn-danger {
-  color: var(--muted);
+  &--danger {
+    color: var(--muted);
 
-  &:hover {
-    color: #c0392b;
+    &:hover { color: #c0392b; }
   }
 }

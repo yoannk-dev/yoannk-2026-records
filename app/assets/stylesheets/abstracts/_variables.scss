@@ -2,6 +2,47 @@
 // Design tokens — CSS custom properties enable runtime theme switching
 // ==========================================================================
 
+// --- SCSS static tokens ---
+
+// Spacing
+$spacing-xxs: 4px;
+$spacing-xs:  8px;
+$spacing-sm:  12px;
+$spacing-md:  16px;
+$spacing-lg:  24px;
+$spacing-xl:  28px;   // standard side padding (topbar, grid, masthead, flash)
+$spacing-xxl: 36px;
+
+// Typography — sizes
+$font-size-xs: 11px;
+$font-size-sm: 12px;
+$font-size-md: 13px;
+$font-size-lg: 14px;
+$font-size-xl: 17px;
+
+// Typography — weights
+$font-weight-medium:    500;
+$font-weight-semibold:  600;
+$font-weight-bold:      700;
+$font-weight-extrabold: 800;
+
+// Border radius
+$border-radius-xs:     4px;
+$border-radius-sm:     6px;
+$border-radius-md:     8px;
+$border-radius-lg:     12px;
+$border-radius-circle: 50%;
+$border-radius-pill:   999px;
+
+// Transitions
+$duration-fast: 0.15s;
+$duration-base: 0.25s;
+
+// Breakpoints
+$bp-mobile: 720px;
+
+// --- CSS custom properties (runtime theme) ---
+
 :root[data-theme="light"] {
   --bg: #f5f4f1;
   --surface: #ffffff;
@@ -22,8 +63,4 @@
   --topbar: rgba(14, 14, 16, 0.86);
   --accent: #e8541e;
   --cover-radius: 2px;
-}
-
-@keyframes disc-spin {
-  to { transform: rotate(360deg); }
 }
