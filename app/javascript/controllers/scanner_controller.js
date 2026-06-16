@@ -64,10 +64,21 @@ export default class extends Controller {
     this.#stopCamera()
     this.retryBtnTarget.classList.add("u-hidden")
     this.#retryValue = null
-    this.manualFormTarget.classList.add("u-hidden")
-    this.manualBtnTarget.classList.add("u-hidden")
     this.#setStatus("")
-    await this.#startCamera()
+
+    if (mode === "catno") {
+      this.manualBtnTarget.classList.add("u-hidden")
+      this.manualInputTarget.inputMode = "text"
+      this.manualInputTarget.placeholder = "ex : BLP 1568, ECM 1064"
+      this.manualInputTarget.value = ""
+      this.#setStatus("Entrez le numéro de catalogue inscrit sur l'étiquette :")
+      this.manualFormTarget.classList.remove("u-hidden")
+      this.manualInputTarget.focus()
+    } else {
+      this.manualFormTarget.classList.add("u-hidden")
+      this.manualBtnTarget.classList.add("u-hidden")
+      await this.#startCamera()
+    }
   }
 
   showManual() {
@@ -96,7 +107,7 @@ export default class extends Controller {
   }
 
   async #startCamera() {
-    if (this.#mode === "barcode" && !("BarcodeDetector" in window)) {
+    if (!("BarcodeDetector" in window)) {
       try {
         const { BarcodeDetector } = await import("barcode-detector")
         window.BarcodeDetector = BarcodeDetector
@@ -110,25 +121,13 @@ export default class extends Controller {
       this.#stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       this.videoTarget.srcObject = this.#stream
       await this.videoTarget.play()
-
-      if (this.#mode === "barcode") {
-        this.#detector = new window.BarcodeDetector({ formats: ["ean_13", "upc_a", "upc_e", "ean_8"] })
-        this.#setStatus("Scan en cours… pointez la caméra vers le code-barres")
-        this.#scanning = true
-        this.#scanLoop()
-      } else {
-        this.#setStatus("Pointez la caméra vers l'étiquette du disque")
-      }
-
+      this.#detector = new window.BarcodeDetector({ formats: ["ean_13", "upc_a", "upc_e", "ean_8"] })
+      this.#setStatus("Scan en cours… pointez la caméra vers le code-barres")
+      this.#scanning = true
+      this.#scanLoop()
       this.manualBtnTarget.classList.remove("u-hidden")
     } catch {
-      const isBarcode = this.#mode === "barcode"
-      this.#showManualFallback(
-        isBarcode ? "Accès caméra refusé. Entrez le code-barres manuellement :" : "Accès caméra refusé. Entrez le numéro de catalogue :",
-        "",
-        isBarcode ? "numeric" : "text",
-        isBarcode ? "ex : 0602435688435" : "ex : BLP 1568, ECM 1064"
-      )
+      this.#showManualFallback("Accès caméra refusé. Entrez le code-barres manuellement :")
     }
   }
 
