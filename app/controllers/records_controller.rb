@@ -6,7 +6,7 @@ class RecordsController < ApplicationController
     @genre    = params[:genre].presence
     @genres   = owner_genres
     @page     = (params[:page] || 1).to_i
-    base      = owner_records.by_genre(@genre).recent
+    base      = owner_records.by_genre(@genre).by_artist
     @records  = base.includes(:label).for_page(@page)
     @has_more = base.count > @page * Record::PER_PAGE
   end
@@ -79,7 +79,7 @@ class RecordsController < ApplicationController
   end
 
   def setup_index(page:, genre:)
-    base      = owner_records.by_genre(genre).recent
+    base      = owner_records.by_genre(genre).by_artist
     @genre    = genre
     @genres   = owner_genres
     @page     = page
