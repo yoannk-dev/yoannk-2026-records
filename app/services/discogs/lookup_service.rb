@@ -25,7 +25,7 @@ class Discogs::LookupService < Discogs::BaseService
   end
 
   def search_params
-    { token: token, per_page: 1 }.tap do |p|
+    { token: token, per_page: 1, format: "Vinyl" }.tap do |p|
       p[:barcode] = @barcode if @barcode.present?
       p[:catno]   = @catno   if @catno.present?
     end
