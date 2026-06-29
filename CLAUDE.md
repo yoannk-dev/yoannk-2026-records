@@ -110,11 +110,27 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 
 `User.first` is always the owner. `user_records` links users to records with condition/date.
 
+**Record model scopes:**
+
+| Scope | SQL |
+|-------|-----|
+| `by_genre(g)` | `WHERE genre = ?` (no-op if blank) |
+| `search(q)` | `WHERE artist ILIKE ? OR title ILIKE ?` (sanitized; no-op if blank) |
+| `by_artist` / `by_artist_desc` | `ORDER BY LOWER(artist) ASC/DESC` |
+| `by_date_asc` / `by_date_desc` | `ORDER BY user_records.added_at ASC/DESC` — requires a join to `user_records` |
+| `for_page(n)` | `LIMIT 24 OFFSET (n-1)*24` |
+
+`SORT_OPTIONS = %w[artist_asc artist_desc date_asc date_desc]` — the controller validates against this constant before applying a sort.
+
+**DB indexes** (migration `optimize_records_indexes`): `pg_trgm` extension enabled; GIN trigram indexes on `artist` and `title` for fast ILIKE; `LOWER(artist)` B-tree index for case-insensitive order.
+
 ## Key conventions
 
 **Tracklist format** — stored as a JSONB hash keyed by lowercase side letter: `{ "a" => ["Track 1", …], "b" => […], "c" => […] }`. Any number of sides is supported. The panel partial iterates `tl.sort.flat_map(&:last)`.
 
 **Panel / Turbo Frame** — the detail panel and the add-record form both render inside `<turbo-frame id="panel_content">`. The `panel` Stimulus controller lives on `<body>` (must be ancestor of both the grid and the panel aside). It pushes URL via `history.pushState` and restores the genre filter on close.
+
+**URL params** — `?genre=`, `?q=`, `?sort=`, and `?page=` are independent and composable. Genre chips preserve `q` and `sort`; the search controller preserves `genre` and `sort` (and resets `page`); the sort controller preserves `genre` and `q` (and resets `page`). Always thread all active params through link/navigation helpers.
 
 **Auth** — login form uses `data-turbo="false"` to bypass Turbo fetch (avoids CSRF/header mismatch with Devise). No registration or password reset.
 
@@ -126,7 +142,7 @@ users         — Devise (database_authenticatable, rememberable, validatable)
 | `app/views/records/_sleeve.html.erb` | Album cover image wrapper |
 | `app/views/records/_record.html.erb` | Grid cell |
 | `app/views/records/_masthead.html.erb` | Hero header with animated disc + stats |
-| `app/views/records/_topbar.html.erb` | Genre filter chips + action buttons |
+| `app/views/records/_topbar.html.erb` | Genre filter chips + search bar + sort dropdown + action buttons |
 | `app/views/records/_panel_cover.html.erb` | Vinyl disc + sleeve in the detail panel |
 | `app/views/records/_panel_meta.html.erb` | Label / Cat # / Format / Condition grid |
 | `app/views/records/_panel_tracklist.html.erb` | Multi-side tracklist (A, B, C, D…) |
@@ -195,6 +211,8 @@ pin_all_from "app/javascript/helpers", under: "helpers"
 | `.scrim--open` | `panel` controller |
 | `.panel__disc--out` | `panel-disc` controller (50 ms after connect) |
 | `.chip--active` | `filter` controller |
+| `.sort--open` | `sort` controller |
+| `.sort-option--active` | `sort` controller |
 | `.scanner--open` | `scanner` controller |
 | `.is-active` | `scanner` controller (mode tabs) |
 | `.u-hidden` | `scanner` controller (show/hide elements) |
@@ -215,4 +233,6 @@ pin_all_from "app/javascript/helpers", under: "helpers"
 | `add-prompt` | Shows login-link tooltip for guests; triggers `scanner#open` when logged in. |
 | `theme` | Toggles `data-theme` on `<html>`, persists to `localStorage`. |
 | `filter` | Syncs `chip--active` class and `aria-current="page"` with current `?genre=` param on connect. |
+| `search` | Debounced (300 ms) text search — navigates to `/?q=` via `Turbo.visit` while preserving `genre`/`sort`; resets `page`. Restores caret position via `sessionStorage`. Keyboard shortcut: `/` focuses the input. |
+| `sort` | Sort dropdown — toggles `sort--open` on button click, closes on outside click, updates `?sort=` param via `Turbo.visit` while preserving `genre`/`q`; resets `page`. |
 | `infinite-scroll` | IntersectionObserver sentinel — fetches next page and appends `.cell` elements to `#records-grid`. |

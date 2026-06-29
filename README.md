@@ -10,7 +10,7 @@ This project is a personal demonstration project for my portfolio, and addresses
 
 ## Features
 
-- **Browsable collection** — filterable by genre, paginated with infinite scroll
+- **Browsable collection** — filterable by genre, searchable by artist/title, sortable (alphabetical or by date added), paginated with infinite scroll
 - **Record detail panel** — slide-in panel with tracklist, metadata, and sleeve art, driven by Turbo Frames
 - **Discogs integration** — look up records by barcode or catalog number to pre-fill the add form (artist, title, label, tracklist, cover art)
 - **Barcode scanner** — native `BarcodeDetector` API with a polyfill fallback; requires 3 consecutive identical reads before triggering a lookup
