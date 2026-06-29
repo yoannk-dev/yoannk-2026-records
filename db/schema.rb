@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_153956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
+  enable_extension "pg_trgm"
 
   create_table "labels", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -37,9 +38,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_000001) do
     t.jsonb "tracklist"
     t.datetime "updated_at", null: false
     t.integer "year"
+    t.index "lower((artist)::text)", name: "index_records_on_lower_artist"
+    t.index ["artist"], name: "index_records_on_artist_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["discogs_id"], name: "index_records_on_discogs_id", unique: true, where: "(discogs_id IS NOT NULL)"
     t.index ["genre"], name: "index_records_on_genre"
     t.index ["label_id"], name: "index_records_on_label_id"
+    t.index ["title"], name: "index_records_on_title_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|

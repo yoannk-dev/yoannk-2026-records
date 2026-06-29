@@ -79,8 +79,8 @@ class RecordsController < ApplicationController
   private
 
   def find_record
-    @record = @owner&.records&.includes(:label)&.find(params[:id]) ||
-              raise(ActiveRecord::RecordNotFound)
+    raise ActiveRecord::RecordNotFound unless @owner
+    @record = @owner.records.includes(:label).find(params[:id])
   end
 
   def setup_index(page:, genre:)
@@ -97,10 +97,10 @@ class RecordsController < ApplicationController
 
   def apply_sort(base, sort)
     case sort
-    when "artist_desc" then base.order(Arel.sql("LOWER(artist) DESC"))
-    when "date_asc"    then base.order("user_records.added_at ASC")
-    when "date_desc"   then base.order("user_records.added_at DESC")
-    else                    base.order(Arel.sql("LOWER(artist) ASC"))
+    when "artist_desc" then base.by_artist_desc
+    when "date_asc"    then base.by_date_asc
+    when "date_desc"   then base.by_date_desc
+    else                    base.by_artist
     end
   end
 
@@ -124,7 +124,7 @@ class RecordsController < ApplicationController
       barcode:         params[:barcode],
       cover_image_url: params[:cover_image_url],
       discogs_id:      params[:discogs_id],
-      tracklist:       params[:tracklist].present? ? JSON.parse(params[:tracklist]) : nil
+      tracklist:       params[:tracklist].present? ? (JSON.parse(params[:tracklist]) rescue nil) : nil
     }
   end
 
