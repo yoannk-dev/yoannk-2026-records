@@ -8,8 +8,8 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  @include flex(row, center, flex-start, $spacing-xl);
-  padding: $spacing-md 0 $spacing-md $spacing-xl;
+  @include flex(row, center, flex-start, $spacing-md);
+  padding: $spacing-md $spacing-md $spacing-md $spacing-xl;
   background: var(--topbar);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
