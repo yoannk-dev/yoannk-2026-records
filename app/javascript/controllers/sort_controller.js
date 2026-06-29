@@ -1,15 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dropdown"]
-
   #onOutsideClick = (e) => {
     if (!this.element.contains(e.target)) this.close()
   }
 
+  get #button() {
+    return this.element.querySelector("[aria-expanded]")
+  }
+
   toggle() {
     const isOpen = this.element.classList.toggle("sort--open")
-    this.element.querySelector("[aria-expanded]")?.setAttribute("aria-expanded", isOpen)
+    this.#button?.setAttribute("aria-expanded", isOpen)
     if (isOpen) {
       document.addEventListener("click", this.#onOutsideClick)
     } else {
@@ -19,7 +21,7 @@ export default class extends Controller {
 
   close() {
     this.element.classList.remove("sort--open")
-    this.element.querySelector("[aria-expanded]")?.setAttribute("aria-expanded", "false")
+    this.#button?.setAttribute("aria-expanded", "false")
     document.removeEventListener("click", this.#onOutsideClick)
   }
 
