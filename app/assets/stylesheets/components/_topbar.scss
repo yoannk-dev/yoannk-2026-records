@@ -90,6 +90,7 @@
   @include flex(row, center, flex-start, $spacing-xs);
   flex: 0 1 220px;
   padding: 3px $spacing-sm;
+  background: var(--surface);
   border-radius: $border-radius-pill;
   border: 1px solid var(--line);
   color: var(--muted);
@@ -168,6 +169,7 @@
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   white-space: nowrap;
+  background: var(--surface);
 }
 
 .topbar__sort-label {

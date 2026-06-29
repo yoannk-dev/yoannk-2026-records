@@ -20,6 +20,9 @@
           data-scanner-lookup-url-value="<%= records_discogs_lookup_path %>"
           data-scanner-tracklist-url-value="<%= records_discogs_tracklist_path %>"
         <% end %>>
+    <div class="verbatim" role="banner" aria-label="Site description">
+      A personal vinyl record collection tracker by <strong><a href="https://yoann-k.com" target="_blank">yoann-k</a></strong>. Each record is imported via Discogs API by scanning the barcode or by catalog number.
+    </div>
     <%= render "layouts/flash" %>
     <%= yield %>
     <%= render "layouts/panel" %>

@@ -1,0 +1,20 @@
+@use "../abstracts/mixins" as *;
+
+.verbatim {
+  padding: $spacing-sm $spacing-md;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  gap: 4px;
+  background: var(--surface);
+
+  strong {
+    color: var(--ink);
+    font-weight: $font-weight-bold;
+
+    a {
+      color: var(--accent);
+    }
+  }
+}
