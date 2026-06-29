@@ -9,6 +9,7 @@ class Record < ApplicationRecord
   validates :artist, :title, presence: true
 
   scope :by_genre,   ->(genre) { genre.present? ? where(genre: genre) : all }
+  scope :search,     ->(q) { q.present? ? where("artist ILIKE :q OR title ILIKE :q", q: "%#{sanitize_sql_like(q.strip)}%") : all }
   scope :recent,     -> { order(created_at: :desc) }
   scope :by_artist,  -> { order(Arel.sql("LOWER(artist) ASC")) }
   scope :for_page,   ->(page) { limit(PER_PAGE).offset((page.to_i - 1) * PER_PAGE) }

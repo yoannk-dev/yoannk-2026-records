@@ -1,6 +1,6 @@
 <div class="app">
   <%= render "masthead" %>
-  <%= render "topbar", genres: @genres, genre: @genre %>
+  <%= render "topbar", genres: @genres, genre: @genre, q: @q, sort: @sort %>
 
   <main class="grid" id="records-grid">
     <%= render partial: "record", collection: @records, as: :record %>
@@ -8,13 +8,19 @@
 
   <% if @records.empty? %>
     <div class="grid__empty">
-      <%= @genre.present? ? "Nothing in #{@genre} yet." : "No records in the collection yet." %>
+      <% if @q.present? %>
+        No results for &ldquo;<%= @q %>&rdquo;.
+      <% elsif @genre.present? %>
+        Nothing in <%= @genre %> yet.
+      <% else %>
+        No records in the collection yet.
+      <% end %>
     </div>
   <% end %>
 
   <% if @has_more %>
     <div data-controller="infinite-scroll"
-         data-infinite-scroll-url-value="<%= root_path(page: @page + 1, genre: @genre) %>">
+         data-infinite-scroll-url-value="<%= root_path(page: @page + 1, genre: @genre, q: @q, sort: @sort) %>">
     </div>
   <% end %>
 </div>

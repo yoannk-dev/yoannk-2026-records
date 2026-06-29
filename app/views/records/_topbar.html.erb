@@ -1,15 +1,103 @@
-<%# locals: (genres:, genre:) %>
-<header class="topbar" data-controller="filter" data-filter-genre-value="<%= genre %>">
+<%# locals: (genres:, genre:, q: nil, sort: "artist_asc") %>
+<% sort_labels = {
+  "artist_asc"  => "Alphabetical",
+  "artist_desc" => "Alphabetical",
+  "date_asc"    => "Date added",
+  "date_desc"   => "Date added"
+} %>
+<% sort_dirs = {
+  "artist_asc"  => "A → Z",
+  "artist_desc" => "Z → A",
+  "date_asc"    => "Oldest",
+  "date_desc"   => "Newest"
+} %>
+<div class="topbar" data-controller="filter" data-filter-genre-value="<%= genre %>">
   <nav class="topbar__filters" aria-label="Filter by genre">
-    <%= link_to "All", root_path,
+    <%= link_to "All", root_path(q: q, sort: sort),
           class: "chip #{'chip--active' if genre.blank?}",
           data: { turbo_action: "replace" } %>
     <% genres.each do |g| %>
-      <%= link_to g, root_path(genre: g),
+      <%= link_to g, root_path(genre: g, q: q, sort: sort),
             class: "chip #{'chip--active' if genre == g}",
             data: { turbo_action: "replace" } %>
     <% end %>
   </nav>
+
+  <div class="topbar__search" data-controller="search">
+    <svg class="topbar__search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <input type="search"
+           class="topbar__search-input"
+           placeholder="Search artist or title"
+           value="<%= q %>"
+           autocomplete="off"
+           data-search-target="input"
+           data-action="input->search#search">
+    <button class="topbar__search-clear"
+            data-action="click->search#clear"
+            aria-label="Clear search"
+            tabindex="-1">
+      <svg width="7" height="7" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="topbar__sort" data-controller="sort">
+    <button class="topbar__sort-btn btn btn--ghost"
+            data-action="click->sort#toggle"
+            aria-expanded="false"
+            aria-haspopup="true">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="topbar__sort-label"><%= sort_labels[sort] || "Alphabetical" %></span>
+      <span class="topbar__sort-dir"><%= sort_dirs[sort] || "A → Z" %></span>
+      <svg class="topbar__sort-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="sort-dropdown" data-sort-target="dropdown" role="menu">
+      <p class="sort-dropdown__header">SORT BY</p>
+
+      <div class="sort-dropdown__group">
+        <span class="sort-dropdown__label">Alphabetical</span>
+        <div class="sort-dropdown__options">
+          <button class="sort-option <%= 'sort-option--active' if sort == 'artist_asc' %>"
+                  data-action="click->sort#select"
+                  data-sort-value="artist_asc"
+                  role="menuitemradio"
+                  aria-checked="<%= sort == 'artist_asc' %>">A &#x2192; Z</button>
+          <button class="sort-option <%= 'sort-option--active' if sort == 'artist_desc' %>"
+                  data-action="click->sort#select"
+                  data-sort-value="artist_desc"
+                  role="menuitemradio"
+                  aria-checked="<%= sort == 'artist_desc' %>">Z &#x2192; A</button>
+        </div>
+      </div>
+
+      <div class="sort-dropdown__group">
+        <span class="sort-dropdown__label">Date added</span>
+        <div class="sort-dropdown__options">
+          <button class="sort-option <%= 'sort-option--active' if sort == 'date_asc' %>"
+                  data-action="click->sort#select"
+                  data-sort-value="date_asc"
+                  role="menuitemradio"
+                  aria-checked="<%= sort == 'date_asc' %>">Oldest</button>
+          <button class="sort-option <%= 'sort-option--active' if sort == 'date_desc' %>"
+                  data-action="click->sort#select"
+                  data-sort-value="date_desc"
+                  role="menuitemradio"
+                  aria-checked="<%= sort == 'date_desc' %>">Newest</button>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
 
   <div class="topbar__actions">
     <% if user_signed_in? %>
@@ -21,4 +109,4 @@
       </button>
     <% end %>
   </div>
-</header>
+</div>

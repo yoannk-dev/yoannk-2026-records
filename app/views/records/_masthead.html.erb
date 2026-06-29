@@ -1,6 +1,6 @@
 <header class="masthead">
   <h1 class="masthead__title">
-    Vinyles
+    <%= link_to root_path, data: { turbo_action: "replace" } do %>Vinyles<% end %>
     <span class="masthead__disc" aria-hidden="true">
       <span class="masthead__disc-label" style="background: var(--accent)">
         <span class="masthead__disc-notch"></span>
@@ -9,7 +9,7 @@
     </span>
   </h1>
   <div class="masthead__meta">
-    <div><strong><%= @owner&.records&.count || 0 %></strong> records</div>
+    <div><strong><%= @total_count || 0 %></strong> records</div>
     <button class="icon-btn"
             data-action="theme#toggle"
             aria-label="Toggle theme"
