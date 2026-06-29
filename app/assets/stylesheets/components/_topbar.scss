@@ -8,16 +8,16 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  @include flex(row, center, flex-start, $spacing-xl);
-  padding: $spacing-md $spacing-xl;
+  @include flex(row, center, flex-start, $spacing-md);
+  padding: $spacing-md $spacing-md $spacing-md $spacing-xl;
   background: var(--topbar);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 
   @include respond-to("mobile") {
-    gap: 0;
-    padding: 14px $spacing-md;
+    gap: $spacing-xs;
+    padding: 10px $spacing-md;
     flex-wrap: wrap;
   }
 
@@ -59,6 +59,8 @@
   &__actions {
     @include flex(row, center, flex-start, 10px);
     flex: none;
+
+    @include respond-to("mobile") { display: none; }
   }
 }
 
@@ -80,6 +82,166 @@
     background: var(--ink);
 
     &:hover { color: var(--bg); }
+  }
+}
+
+// Search input
+.topbar__search {
+  @include flex(row, center, flex-start, $spacing-xs);
+  flex: 0 1 220px;
+  padding: 3px $spacing-sm;
+  border-radius: $border-radius-pill;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  transition: border-color $duration-fast, color $duration-fast;
+
+  &:focus-within {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  @include respond-to("mobile") {
+    order: 1;
+    flex: 1 1 auto;
+  }
+}
+
+.topbar__search-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.topbar__search-input {
+  flex: 1;
+  min-width: 0;
+  font-size: $font-size-md;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 6px 0;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder { color: var(--muted); }
+  &::-webkit-search-cancel-button { -webkit-appearance: none; }
+}
+
+.topbar__search-clear {
+  @include flex(row, center, center);
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: $border-radius-circle;
+  color: var(--muted);
+  background: var(--line);
+  visibility: hidden;
+  pointer-events: none;
+  transition: color $duration-fast, background $duration-fast;
+
+  &:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--line) 70%, var(--ink));
+  }
+}
+
+.topbar__search-input:not(:placeholder-shown) ~ .topbar__search-clear {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+// Sort button + dropdown
+.topbar__sort {
+  position: relative;
+  flex-shrink: 0;
+
+  @include respond-to("mobile") { order: 2; }
+}
+
+.topbar__sort-btn {
+  @include flex(row, center, center, $spacing-xs);
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.topbar__sort-label {
+  @include respond-to("mobile") { display: none; }
+}
+
+.topbar__sort-dir {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--muted);
+
+  @include respond-to("mobile") { display: none; }
+}
+
+.topbar__sort-chevron {
+  transition: transform $duration-fast;
+
+  .sort--open & { transform: rotate(180deg); }
+}
+
+.sort-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + $spacing-xs);
+  right: 0;
+  z-index: 50;
+  min-width: 260px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  .sort--open & { display: block; }
+}
+
+.sort-dropdown__header {
+  @include label-uppercase;
+  margin-bottom: $spacing-sm;
+}
+
+.sort-dropdown__group {
+  @include flex(row, center, space-between, $spacing-xs);
+  padding: $spacing-xs 0;
+
+  & + & { border-top: 1px solid var(--line); }
+}
+
+.sort-dropdown__label {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.sort-dropdown__options {
+  @include flex(row, center, flex-end, $spacing-xxs);
+}
+
+.sort-option {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--muted);
+  padding: 5px $spacing-sm;
+  border-radius: $border-radius-pill;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+  transition: color $duration-fast, background $duration-fast, border-color $duration-fast;
+
+  &:hover { color: var(--ink); }
+
+  &--active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+
+    &:hover { opacity: 0.88; }
   }
 }
 
